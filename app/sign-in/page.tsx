@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '@/app/firebase/firebaseConfig';
 import { useRouter } from 'next/navigation';
+import { GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
+import Image from 'next/image';
 
 const SignIn: React.FC = () => {
     const [email, setEmail] = useState<string>('');
@@ -15,12 +17,22 @@ const SignIn: React.FC = () => {
         try {
             const res = await signInWithEmailAndPassword(email, password);
             console.log({ res });
-            sessionStorage.setItem('user', 'true'); // 'true' as a string
+            sessionStorage.setItem('user', 'true');
             setEmail('');
             setPassword('');
             router.push('/');
         } catch (e) {
             console.error(e);
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        try {
+            await signInWithRedirect(auth, new GoogleAuthProvider());
+            router.push('/');
+
+        } catch (error) {
+            console.error("Error signing in with Google: ", error);
         }
     };
 
@@ -48,6 +60,19 @@ const SignIn: React.FC = () => {
                     disabled={loading} // Optional: disable button while loading
                 >
                     Sign In
+                </button>
+                <button
+                    onClick={handleGoogleSignIn}
+                    className="w-full p-3 mt-4 bg-white rounded flex items-center justify-center border border-gray-300 hover:bg-gray-100"
+                >
+                    <Image
+                        src="/google-icon.png"
+                        alt="Google Logo"
+                        width={20}
+                        height={20}
+                        className="mr-2"
+                    />
+                    <span className="text-gray-800 font-medium">Sign in with Google</span>
                 </button>
                 {error && <p className="text-red-500 mt-3">{error.message}</p>} {/* Optional: display error message */}
             </div>
