@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '@/app/firebase/firebaseConfig';
+import { useRouter } from 'next/navigation';
 
 const SignIn: React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [signInWithEmailAndPassword, userCred, loading, error] = useSignInWithEmailAndPassword(auth);
+    const router = useRouter()
 
     const handleSignIn = async () => {
         try {
@@ -16,6 +18,7 @@ const SignIn: React.FC = () => {
             sessionStorage.setItem('user', 'true'); // 'true' as a string
             setEmail('');
             setPassword('');
+            router.push('/');
         } catch (e) {
             console.error(e);
         }
