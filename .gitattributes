@@ -1,2 +1,13 @@
 # Auto detect text files and perform LF normalization
-* text=auto
+* text=auto eol=lf
+
+# Ensure that all files are treated as text
+*.txt text
+*.md text
+*.ts text
+*.js text
+
+# Binary files should not have end-of-line conversion
+*.jpg binary
+*.png binary
+*.gif binary
