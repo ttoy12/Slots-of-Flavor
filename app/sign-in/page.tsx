@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '@/app/firebase/firebaseConfig';
 import { useRouter } from 'next/navigation';
-import { GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 import Image from 'next/image';
 import Link from 'next/link';
+import Cookies from 'js-cookie';
 
 const SignIn: React.FC = () => {
     const [email, setEmail] = useState<string>('');
@@ -18,7 +19,7 @@ const SignIn: React.FC = () => {
         try {
             const res = await signInWithEmailAndPassword(email, password);
             console.log({ res });
-            sessionStorage.setItem('user', 'true');
+            Cookies.set('user', JSON.stringify({ email }), { expires: 7 }); // Expires in 7 days
             setEmail('');
             setPassword('');
             router.push('/');
@@ -29,13 +30,26 @@ const SignIn: React.FC = () => {
 
     const handleGoogleSignIn = async () => {
         try {
-            await signInWithRedirect(auth, new GoogleAuthProvider());
-            router.push('/');
+            const res = await signInWithRedirect(auth, new GoogleAuthProvider());
+            console.log({ res });
 
         } catch (error) {
-            console.error("Error signing in with Google: ", error);
+            console.error("Error initiating Google sign-in: ", error);
         }
     };
+
+    useEffect(() => {
+        const fetchRedirectResult = async () => {
+            const result = await getRedirectResult(auth);
+            console.log(result);
+            if (result?.user) {
+                Cookies.set('user', JSON.stringify({ email: result.user.email }), { expires: 7 });
+                router.push('/');
+            }
+        };
+
+        fetchRedirectResult();
+    }, [router]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-900">

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '@/app/firebase/firebaseConfig';
 import Link from 'next/link';
+import Cookies from 'js-cookie';
 
 const SignUp: React.FC = () => {
     const [email, setEmail] = useState<string>('');
@@ -14,7 +15,7 @@ const SignUp: React.FC = () => {
         try {
             const res = await createUserWithEmailAndPassword(email, password);
             console.log({ res });
-            sessionStorage.setItem('user', 'true'); // 'true' as a string
+            Cookies.set('user', JSON.stringify({ email }), { expires: 7 }); // Expires in 7 days
             setEmail('');
             setPassword('');
         } catch (e) {
