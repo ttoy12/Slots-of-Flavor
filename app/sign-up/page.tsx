@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '@/app/firebase/firebaseConfig';
+import Link from 'next/link';
 
 const SignUp: React.FC = () => {
     const [email, setEmail] = useState<string>('');
@@ -46,7 +47,13 @@ const SignUp: React.FC = () => {
                 >
                     Sign Up
                 </button>
-                {error && <p className="text-red-500 mt-3">{error.message}</p>} {/* Optional: display error message */}
+                {error && <p className="text-red-500 mt-3">{error.message}</p>}
+                <p className="text-center text-gray-400 mt-4">
+                    Already have an account?&nbsp;
+                    <Link href="/sign-in" className="text-indigo-500 hover:underline">
+                        Click here to log in
+                    </Link>
+                </p>
             </div>
         </div>
     );

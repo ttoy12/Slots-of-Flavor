@@ -6,6 +6,7 @@ import { auth } from '@/app/firebase/firebaseConfig';
 import { useRouter } from 'next/navigation';
 import { GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const SignIn: React.FC = () => {
     const [email, setEmail] = useState<string>('');
@@ -74,7 +75,13 @@ const SignIn: React.FC = () => {
                     />
                     <span className="text-gray-800 font-medium">Sign in with Google</span>
                 </button>
-                {error && <p className="text-red-500 mt-3">{error.message}</p>} {/* Optional: display error message */}
+                {error && <p className="text-red-500 mt-3">{error.message}</p>}
+                <p className="text-center text-gray-400 mt-4">
+                    Don't have an account?&nbsp;
+                    <Link href="/sign-up" className="text-indigo-500 hover:underline">
+                        Click here to sign up
+                    </Link>
+                </p>
             </div>
         </div>
     );
