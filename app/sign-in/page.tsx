@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '@/app/firebase/firebaseConfig';
 import { useRouter } from 'next/navigation';
-import { GoogleAuthProvider, signInWithRedirect, getRedirectResult } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, signInWithPopup } from 'firebase/auth';
 import Image from 'next/image';
 import Link from 'next/link';
 import Cookies from 'js-cookie';
@@ -32,26 +32,34 @@ const SignIn: React.FC = () => {
 
     const handleGoogleSignIn = async () => {
         try {
-            const res = await signInWithRedirect(auth, new GoogleAuthProvider());
+            // https://www.reddit.com/r/Firebase/comments/1doskev/signinwithredirect_is_not_signing_in_but/ 
+            // sign in with redirect not working on local
+            // const res = await signInWithRedirect(auth, new GoogleAuthProvider());
+            // console.log({ res });
+            const res = await signInWithPopup(auth, new GoogleAuthProvider());
             console.log({ res });
+            if (res?.user) {
+                Cookies.set('user', JSON.stringify({ email: res.user.email }), { expires: 7 });
+                router.push('/');
+            }
 
         } catch (error) {
             console.error("Error initiating Google sign-in: ", error);
         }
     };
 
-    useEffect(() => {
-        const fetchRedirectResult = async () => {
-            const result = await getRedirectResult(auth);
-            console.log(result);
-            if (result?.user) {
-                Cookies.set('user', JSON.stringify({ email: result.user.email }), { expires: 7 });
-                router.push('/');
-            }
-        };
+    // useEffect(() => {
+    //     const fetchRedirectResult = async () => {
+    //         const result = await getRedirectResult(auth);
+    //         console.log(result);
+    //         if (result?.user) {
+    //             Cookies.set('user', JSON.stringify({ email: result.user.email }), { expires: 7 });
+    //             router.push('/');
+    //         }
+    //     };
 
-        fetchRedirectResult();
-    }, [router]);
+    //     fetchRedirectResult();
+    // }, [router]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-900">
