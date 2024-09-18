@@ -4,11 +4,10 @@ import React from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { auth } from './firebase/firebaseConfig'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
 import { signOut } from 'firebase/auth'
 
 export default function page() {
-  const [user] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
   const router = useRouter();
   const userSession = sessionStorage.getItem('user');
 
@@ -18,13 +17,13 @@ export default function page() {
 
   return (
     <div className="bg-blue-500 flex flex-col items-center justify-center">
-      <Button onClick={() => {
-        signOut(auth)
-        sessionStorage.removeItem('user')
+      <button onClick={() => {
+        signOut(auth);
+        sessionStorage.removeItem('user');
       }}
       >
         Log Out
-      </Button>
+      </button>
       <h1 className="text-3xl">Home</h1>
       <h2 className="text-xl">What do you want to eat?</h2>
       <ThemeToggle />
