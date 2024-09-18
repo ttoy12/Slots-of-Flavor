@@ -18,11 +18,13 @@ const SignIn: React.FC = () => {
     const handleSignIn = async () => {
         try {
             const res = await signInWithEmailAndPassword(email, password);
-            console.log({ res });
-            Cookies.set('user', JSON.stringify({ email }), { expires: 7 }); // Expires in 7 days
-            setEmail('');
-            setPassword('');
-            router.push('/');
+            if (res?.user) {
+                console.log({ res });
+                Cookies.set('user', JSON.stringify({ email }), { expires: 7 }); // Expires in 7 days
+                setEmail('');
+                setPassword('');
+                router.push('/');
+            }
         } catch (e) {
             console.error(e);
         }

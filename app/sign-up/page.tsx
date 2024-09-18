@@ -14,7 +14,7 @@ const SignUp: React.FC = () => {
     const handleSignUp = async () => {
         try {
             const res = await createUserWithEmailAndPassword(email, password);
-            console.log({ res });
+            // console.log({ res });
             Cookies.set('user', JSON.stringify({ email }), { expires: 7 }); // Expires in 7 days
             setEmail('');
             setPassword('');
