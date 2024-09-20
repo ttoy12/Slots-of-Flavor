@@ -8,6 +8,7 @@ export const addUser = async (uid: string, email: string) => {
         favorites: [],
         createdAt: serverTimestamp(),
     });
+    console.log("added user: ", email);
 };
 
 
@@ -22,6 +23,6 @@ export const addVisitedPlace = async (uid: string, placeId: string) => {
 export const addFavoritePlace = async (uid: string, placeId: string) => {
     const userRef = doc(db, 'users', uid);
     await updateDoc(userRef, {
-        favorites: arrayUnion(placeId);
+        favorites: arrayUnion(placeId)
     })
 }
