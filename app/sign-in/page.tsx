@@ -8,6 +8,9 @@ import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, signInWithPo
 import Image from 'next/image';
 import Link from 'next/link';
 import Cookies from 'js-cookie';
+import { getDoc, doc } from 'firebase/firestore';
+import { addUser } from '../firebase/firestore';
+import { db } from './firebaseConfig';
 
 const SignIn: React.FC = () => {
     const [email, setEmail] = useState<string>('');
@@ -38,6 +41,15 @@ const SignIn: React.FC = () => {
             // console.log({ res });
             const res = await signInWithPopup(auth, new GoogleAuthProvider());
             if (res?.user) {
+                const userDocRef = doc(db, 'users', res.user.uid);
+                const userDoc = await getDoc(userDocRef);
+
+                // if user doesn not exist, add them
+                if (!userDoc.exists()) {
+                    await addUser(res.user.uid, res.user.email);
+                }
+
+                // set user cookies and redirect
                 Cookies.set('user', JSON.stringify({ email: res.user.email }), { expires: 7 });
                 router.push('/');
             }
