@@ -19,8 +19,8 @@ const SignIn: React.FC = () => {
         try {
             const res = await signInWithEmailAndPassword(email, password);
             if (res?.user) {
-                console.log({ res });
-                Cookies.set('user', JSON.stringify({ email }), { expires: 7 }); // Expires in 7 days
+                // console.log(res?.user?.email);
+                Cookies.set('user', JSON.stringify({ email: email }), { expires: 7 }); // Expires in 7 days
                 setEmail('');
                 setPassword('');
                 router.push('/');
@@ -37,7 +37,6 @@ const SignIn: React.FC = () => {
             // const res = await signInWithRedirect(auth, new GoogleAuthProvider());
             // console.log({ res });
             const res = await signInWithPopup(auth, new GoogleAuthProvider());
-            console.log({ res });
             if (res?.user) {
                 Cookies.set('user', JSON.stringify({ email: res.user.email }), { expires: 7 });
                 router.push('/');

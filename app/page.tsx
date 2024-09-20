@@ -10,6 +10,7 @@ import Cookies from 'js-cookie'
 export default function page() {
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
+  console.log(user);
 
   const handleLogout = () => {
     signOut(auth);
@@ -23,7 +24,11 @@ export default function page() {
         Log Out
       </button>
       <h1 className="text-3xl">Home</h1>
-      <h2 className="text-xl">What do you want to eat?</h2>
+      {user ? (
+        <h2 className="text-xl">Hi, {user?.email}</h2>
+      ) : (
+        <h2 className="text-xl">Hi, Guest</h2>
+      )}
       <ThemeToggle />
     </div>
   )
