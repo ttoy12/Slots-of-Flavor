@@ -6,11 +6,13 @@ import { auth } from '@/app/firebase/firebaseConfig';
 import Link from 'next/link';
 import Cookies from 'js-cookie';
 import { addUser } from '../firebase/firestore';
+import { useRouter } from 'next/navigation';
 
 const SignUp: React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [createUserWithEmailAndPassword, userCred, loading, error] = useCreateUserWithEmailAndPassword(auth);
+    const router = useRouter();
 
     const handleSignUp = async () => {
         try {
@@ -21,6 +23,7 @@ const SignUp: React.FC = () => {
                 Cookies.set('user', JSON.stringify({ email }), { expires: 7 }); // Expires in 7 days
                 setEmail('');
                 setPassword('');
+                router.push('/sign-in')
             }
         } catch (e) {
             console.error(e);
