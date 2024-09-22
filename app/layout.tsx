@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Restaurant Roulette",
+  title: "Slots of Flavor",
   description: "Random restuarant selector",
 };
 
