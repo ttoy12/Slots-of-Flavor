@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
 
     if (protectedPaths.includes(pathname) && !userSession) {
         const url = request.nextUrl.clone();
-        url.pathname = '/sign-in';
+        url.pathname = '/welcome';
         return NextResponse.redirect(url);
     }
 
