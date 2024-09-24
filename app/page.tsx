@@ -1,5 +1,4 @@
 "use client"
-import ThemeToggle from '@/components/theme-toggle'
 import React from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { auth } from './firebase/firebaseConfig'
@@ -61,7 +60,6 @@ export default function Home() {
       <button onClick={handleLogout}>
         Log Out
       </button>
-      <ThemeToggle />
       <h1 className="text-3xl">Home</h1>
       {user ? (
         <h2 className="text-xl">Hi, {user?.email}</h2>
