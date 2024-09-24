@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Cookies from 'js-cookie';
 import { addUser } from '../firebase/firestore';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const SignUp: React.FC = () => {
     const [email, setEmail] = useState<string>('');
@@ -31,8 +32,9 @@ const SignUp: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-900">
-            <div className="bg-gray-800 p-10 rounded-lg shadow-xl w-96">
+        <div className="min-h-screen flex items-center justify-center bg-gray-900 w-full">
+            <Image src="/Slots of Flavors png.png" alt="SOF logo" height={350} width={350} className='rounded-lg' />
+            <div className="p-10 w-1/2">
                 <h1 className="text-white text-2xl mb-5">Sign Up</h1>
                 <input
                     type="email"
