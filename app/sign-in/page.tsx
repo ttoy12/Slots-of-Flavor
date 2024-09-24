@@ -76,7 +76,7 @@ const SignIn: React.FC = () => {
     // }, [router]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-900">
+        <div className="min-h-screen flex items-center justify-center bg-gray-900 w-full">
             <div className="bg-gray-800 p-10 rounded-lg shadow-xl w-96">
                 <h1 className="text-white text-2xl mb-5">Sign In</h1>
                 <input

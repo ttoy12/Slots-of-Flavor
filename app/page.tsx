@@ -10,7 +10,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import BusinessList from '@/components/BusinessList'
 
-export default function page() {
+export default function Home() {
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
   const [businesses, setBusinesses] = useState([]);
@@ -49,7 +49,15 @@ export default function page() {
   };
 
   return (
-    <div className="bg-blue-400 flex flex-col items-center justify-center">
+    <div
+      className="bg-blue-400 flex flex-col items-center justify-center"
+    // style={{
+    //   backgroundImage: "url('/SOF-background.png')",
+    //   backgroundSize: 'cover',
+    //   backgroundRepeat: 'no-repeat',
+    //   backgroundPosition: 'center',
+    // }}
+    >
       <button onClick={handleLogout}>
         Log Out
       </button>
