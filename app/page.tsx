@@ -14,15 +14,14 @@ export default function Home() {
   const router = useRouter();
   const [businesses, setBusinesses] = useState([]);
   const [location, setLocation] = useState<string>("");
+  const [distance, setDistance] = useState<string>("");
   const [term, setTerm] = useState<string>("");
   const [price, setPrice] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const getBusinessList = async (location: string) => {
     try {
-      // const response = await axios.get("/api/business");
-      console.log(price)
-      const url = `/api/yelp?location=${location}${term ? `&term=${term}` : ''}${price ? `&price=${price}` : ''}`;
+      const url = `/api/yelp?location=${location}${term ? `&term=${term}` : ''}${price ? `&price=${price}` : ''}${distance ? `&distance=${distance}` : ''}`;
       const response = await axios.get(url);
       const data = await response.data;
       if (data) {
@@ -49,7 +48,7 @@ export default function Home() {
 
   return (
     <div
-      className="bg-blue-400 flex flex-col items-center justify-center"
+      className="bg-blue-400 flex flex-col items-center justify-center w-1/2"
     // style={{
     //   backgroundImage: "url('/SOF-background.png')",
     //   backgroundSize: 'cover',
@@ -76,9 +75,28 @@ export default function Home() {
           required
           className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+
+        <div>
+          <select
+            id="distance"
+            value={distance}
+            onChange={(e) => setDistance(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {/*value is in meters */}
+            <option value="">Select distance</option>
+            <option value="1610">~1 mile</option>
+            <option value="8047">~5 miles</option>
+            <option value="16094">~10 miles</option>
+            <option value="24140">~15 miles</option>
+            <option value="32187">~20 miles</option>
+            <option value="40000">~25 miles</option>
+          </select>
+        </div>
+
         <input
           type="text"
-          placeholder="What type of food?"
+          placeholder="What type of place? (e.g. bar, Chinese, Mexican)"
           value={term}
           onChange={(e) => setTerm(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
