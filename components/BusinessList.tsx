@@ -9,7 +9,18 @@ export default function BusinessList({ businessesData }: any) {
                 {Array.isArray(businessesData) && businessesData.length > 0 ? (
                     businessesData.map((bus: any, index: number) => (
                         <div key={index} className='text-white'>
-                            {bus.name} {/* Make sure bus.name exists */}
+                            <a
+                                href={`${bus.url}`}
+                                className="hover:text-green-800 hover:underline transition duration-200 transform hover:scale-105"
+                                rel="noreferrer noopener"
+                                target="_blank"
+                            >
+                                {bus.name} {/* Make sure bus.name exists */}
+                            </a>
+                            {bus.image_url && (
+                                <img src={`${bus.image_url}`} alt={`${bus.name} image`}
+                                    style={{ width: '100px', height: '100px', objectFit: 'cover' }} />
+                            )}
                         </div>
                     ))
                 ) : (
