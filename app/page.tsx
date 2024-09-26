@@ -66,7 +66,7 @@ export default function Home() {
         <h2 className="text-xl">Hi, Guest</h2>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 p-4 m-4 border rounded-md">
         <input
           type="text"
           placeholder="Enter a location (City or Zipcode)"
