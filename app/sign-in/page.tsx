@@ -11,6 +11,9 @@ import Cookies from 'js-cookie';
 import { getDoc, doc } from 'firebase/firestore';
 import { addUser } from '../firebase/firestore';
 import { db } from '@/app/firebase/firebaseConfig';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+
 
 const SignIn: React.FC = () => {
     const [email, setEmail] = useState<string>('');
@@ -19,6 +22,7 @@ const SignIn: React.FC = () => {
     const router = useRouter();
     const [showResetModal, setShowResetModal] = useState<boolean>(false);
     const [resetEmail, setResetEmail] = useState<string>('');
+    const [showPassword, setShowPassword] = useState<boolean>(false);
 
     const handleSignIn = async () => {
         try {
@@ -103,13 +107,21 @@ const SignIn: React.FC = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
                 />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
-                />
+                <div className="relative mb-4">
+                    <input
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
+                    />
+                    <span
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-3 cursor-pointer"
+                    >
+                        {showPassword ? <VisibilityIcon className="text-gray-500 hover:text-white" /> : <VisibilityOffIcon className="text-gray-500 hover:text-white" />}
+                    </span>
+                </div>
                 <button
                     onClick={handleSignIn}
                     className="w-full p-3 bg-indigo-600 rounded text-white hover:bg-indigo-500"
