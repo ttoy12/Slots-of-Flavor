@@ -8,6 +8,7 @@ import Cookies from 'js-cookie'
 import { useState } from 'react'
 import axios from 'axios'
 import BusinessList from '@/components/BusinessList'
+import { Checkbox, FormControlLabel } from '@mui/material'
 
 export default function Home() {
   const [user, loading] = useAuthState(auth);
@@ -16,12 +17,12 @@ export default function Home() {
   const [location, setLocation] = useState<string>("");
   const [distance, setDistance] = useState<string>("");
   const [term, setTerm] = useState<string>("");
-  const [price, setPrice] = useState<string>("");
+  const [price, setPrice] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const getBusinessList = async (location: string) => {
     try {
-      const url = `/api/yelp?location=${location}${term ? `&term=${term}` : ''}${price ? `&price=${price}` : ''}${distance ? `&distance=${distance}` : ''}`;
+      const url = `/api/yelp?location=${location}${term ? `&term=${term}` : ''}${price.length ? `&price=${price.join(',')}` : ''}${distance ? `&distance=${distance}` : ''}`;
       const response = await axios.get(url);
       const data = await response.data;
       if (data) {
@@ -46,14 +47,29 @@ export default function Home() {
     router.push('/sign-in');
   };
 
+  const handlePriceChange = (value: string) => {
+    setPrice((prev) =>
+      prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]
+    );
+  };
+
+  const handlePriceAnyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setPrice(["1", "2", "3", "4"]);
+    } else {
+      setPrice([]);
+    }
+  };
+
   return (
     <div
-      className="bg-blue-400 flex flex-col items-center justify-center w-1/2"
+      className="bg-blue-400 flex flex-col items-center justify-center"
     // style={{
-    //   backgroundImage: "url('/SOF-background.png')",
+    //   backgroundImage: "url('/possible-SOF-background.png')",
     //   backgroundSize: 'cover',
     //   backgroundRepeat: 'no-repeat',
     //   backgroundPosition: 'center',
+    //   opacity: .8
     // }}
     >
       <button onClick={handleLogout}>
@@ -102,67 +118,30 @@ export default function Home() {
           className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
 
-        <div className="space-y-2">
-          <div className="flex items-center">
-            <input
-              type="radio"
-              id="price-one"
-              name="price"
-              value="1"
-              checked={price === "1"}
-              onChange={(e) => setPrice(e.target.value)}
-              className="mr-2"
+        <div className="flex justify-center">
+          {["1", "2", "3", "4"].map((value) => (
+            <FormControlLabel
+              key={value}
+              control={
+                <Checkbox
+                  checked={price.includes(value)}
+                  onChange={() => handlePriceChange(value)}
+                  color="success"
+                />
+              }
+              label={value === "1" ? "$" : value === "2" ? "$$" : value === "3" ? "$$$" : "$$$$"}
             />
-            <label htmlFor="price-one" className="cursor-pointer">$</label>
-          </div>
-          <div className="flex items-center">
-            <input
-              type="radio"
-              id="price-two"
-              name="price"
-              value="2"
-              checked={price === "2"}
-              onChange={(e) => setPrice(e.target.value)}
-              className="mr-2"
-            />
-            <label htmlFor="price-two" className="cursor-pointer">$$</label>
-          </div>
-          <div className="flex items-center">
-            <input
-              type="radio"
-              id="price-three"
-              name="price"
-              value="3"
-              checked={price === "3"}
-              onChange={(e) => setPrice(e.target.value)}
-              className="mr-2"
-            />
-            <label htmlFor="price-three" className="cursor-pointer">$$$</label>
-          </div>
-          <div className="flex items-center">
-            <input
-              type="radio"
-              id="price-four"
-              name="price"
-              value="4"
-              checked={price === "4"}
-              onChange={(e) => setPrice(e.target.value)}
-              className="mr-2"
-            />
-            <label htmlFor="price-four" className="cursor-pointer">$$$$</label>
-          </div>
-          <div className="flex items-center">
-            <input
-              type="radio"
-              id="price-any"
-              name="price"
-              value="1, 2, 3, 4"
-              checked={price === "1, 2, 3, 4"}
-              onChange={(e) => setPrice(e.target.value)}
-              className="mr-2"
-            />
-            <label htmlFor="price-any" className="cursor-pointer">Any</label>
-          </div>
+          ))}
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={price.length === 4}
+                onChange={handlePriceAnyChange}
+                color="success"
+              />
+            }
+            label="Any"
+          />
         </div>
 
         <button
@@ -172,11 +151,14 @@ export default function Home() {
           Search
         </button>
       </form>
-      {isLoading ? (
-        <div className="mt-4">Loading...</div> // Loading indicator
-      ) : (
-        <BusinessList businessesData={businesses} />
-      )}
+
+      <div className="flex justify-center items-center border">
+        {isLoading ? (
+          <div >Loading...</div> // Loading indicator
+        ) : (
+          <BusinessList businessesData={businesses} className="" />
+        )}
+      </div>
     </div>
   )
 }
