@@ -1,11 +1,21 @@
+"use client"
 // import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import IosShareIcon from '@mui/icons-material/IosShare';
 import { Tooltip } from '@mui/material';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import { useState } from 'react';
+import { addLikedPlace, addDislikedPlace, removedLikedPlace } from '@/app/firebase/firestore';
+import { auth } from '../app/firebase/firebaseConfig';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
-export default function BusinessList({ businessesData }: any) {
-    const randomIndex = Math.floor(Math.random() * businessesData.length);
-    const randomBusiness = businessesData[randomIndex];
-    // console.log("random business: ", randomBusiness?.name);
+export default function BusinessList({ randomBusiness }: any) {
+    // const randomIndex = Math.floor(Math.random() * businessesData.length);
+    // const randomBusiness = businessesData[randomIndex];
+
+    const [user, loading] = useAuthState(auth);
+    const [liked, setLiked] = useState<boolean>(false);
+    const [disliked, setDisliked] = useState<boolean>(false);
 
     const handleShare = async () => {
         if (navigator.share) {
@@ -22,10 +32,24 @@ export default function BusinessList({ businessesData }: any) {
         }
     };
 
+    const handleLiked = () => {
+        setLiked((prev) => !prev);
+        if (disliked) {
+            setDisliked(false);
+        }
+    };
+
+    const handleDislike = async () => {
+        setDisliked((prev) => (!prev));
+        if (liked) {
+            setLiked(false);
+        }
+    }
+
     return (
         <div className="z-20 container p-2">
             <div>
-                {Array.isArray(businessesData) && businessesData.length > 0 ? (
+                {randomBusiness ? (
                     <div className='text-white flex flex-col justify-center items-center'>
                         <Tooltip title={randomBusiness.url} arrow>
                             <a
@@ -56,12 +80,16 @@ export default function BusinessList({ businessesData }: any) {
                                 ))}
                             </div>
                         )}
-                        <Tooltip title="Share" arrow>
-                            <span className="cursor-pointer hover:text-blue-500 hover:scale-105 transition duration-300">
-                                <IosShareIcon fontSize="small" onClick={handleShare} />
-                                {/* <ContentCopyIcon fontSize="small" onClick={() => navigator.clipboard.writeText(randomBusiness.url)} /> */}
-                            </span>
+
+                        <Tooltip title="Share" arrow className="m-2">
+                            <IosShareIcon className="cursor-pointer hover:text-blue-500 hover:scale-105 transition duration-300" fontSize="small" onClick={handleShare} />
+                            {/* <ContentCopyIcon fontSize="small" onClick={() => navigator.clipboard.writeText(randomBusiness.url)} /> */}
                         </Tooltip>
+
+                        <div className="flex flex-row">
+                            <ThumbUpIcon className={`mx-2 cursor-pointer ${liked ? 'text-white' : 'text-gray-300'} hover:scale-110`} onClick={handleLiked} />
+                            <ThumbDownIcon className={`mx-2 cursor-pointer ${disliked ? 'text-white' : 'text-gray-300'}  hover:scale-110`} onClick={handleDislike} />
+                        </div>
                     </div>
                 ) : (
                     <div className='text-white'>No businesses found. Explore different search queries.</div>

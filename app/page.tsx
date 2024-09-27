@@ -12,6 +12,7 @@ import { Checkbox, FormControlLabel } from '@mui/material'
 
 export default function Home() {
   const [user, loading] = useAuthState(auth);
+  console.log("user id", user?.uid);
   const router = useRouter();
   const [businesses, setBusinesses] = useState([]);
   const [location, setLocation] = useState<string>("");
@@ -19,14 +20,16 @@ export default function Home() {
   const [term, setTerm] = useState<string>("");
   const [price, setPrice] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [randomBusiness, setRandomBusiness] = useState(null);
 
   const getBusinessList = async (location: string) => {
     try {
       const url = `/api/yelp?location=${location}${term ? `&term=${term}` : ''}${price.length ? `&price=${price.join(',')}` : ''}${distance ? `&distance=${distance}` : ''}`;
       const response = await axios.get(url);
       const data = await response.data;
-      if (data) {
+      if (data && data.length > 0) {
         setBusinesses(data);
+        setRandomBusiness(data[Math.floor(Math.random() * data.length)])
       }
       console.log(data);
     } catch (error) {
@@ -63,7 +66,7 @@ export default function Home() {
 
   return (
     <div
-      className="bg-blue-400 flex flex-col items-center justify-center"
+      className="bg-blue-400 flex flex-col items-center justify-center rounded-md"
     // style={{
     //   backgroundImage: "url('/possible-SOF-background.png')",
     //   backgroundSize: 'cover',
@@ -152,11 +155,11 @@ export default function Home() {
         </button>
       </form>
 
-      <div className="flex justify-center items-center border">
+      <div className="flex justify-center items-center pb-4">
         {isLoading ? (
           <div >Loading...</div> // Loading indicator
         ) : (
-          <BusinessList businessesData={businesses} className="" />
+          <BusinessList randomBusiness={randomBusiness} className="" />
         )}
       </div>
     </div>
