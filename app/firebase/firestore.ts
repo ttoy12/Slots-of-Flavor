@@ -10,6 +10,7 @@ export interface Business {
 
 export const addUser = async (userID: string, email: string) => {
     await setDoc(doc(db, 'users', userID), {
+        userID,
         email,
         liked: [],
         disliked: [],

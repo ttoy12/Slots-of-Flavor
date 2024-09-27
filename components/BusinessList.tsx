@@ -4,18 +4,21 @@ import IosShareIcon from '@mui/icons-material/IosShare';
 import { Tooltip } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
-import { useState } from 'react';
-import { addLikedPlace, addDislikedPlace, removedLikedPlace } from '@/app/firebase/firestore';
+import { useState, useEffect } from 'react';
+import { addLikedPlace, addDislikedPlace, removedLikedPlace, removedDislikedPlace } from '@/app/firebase/firestore';
 import { auth } from '../app/firebase/firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 export default function BusinessList({ randomBusiness }: any) {
-    // const randomIndex = Math.floor(Math.random() * businessesData.length);
-    // const randomBusiness = businessesData[randomIndex];
-
     const [user, loading] = useAuthState(auth);
     const [liked, setLiked] = useState<boolean>(false);
     const [disliked, setDisliked] = useState<boolean>(false);
+
+    // Reset liked and disliked states when randomBusiness changes
+    useEffect(() => {
+        setLiked(false);
+        setDisliked(false);
+    }, [randomBusiness]);
 
     const handleShare = async () => {
         if (navigator.share) {
@@ -32,18 +35,38 @@ export default function BusinessList({ randomBusiness }: any) {
         }
     };
 
-    const handleLiked = () => {
-        setLiked((prev) => !prev);
-        if (disliked) {
-            setDisliked(false);
+    const handleLiked = async () => {
+        if (!user) return; // checking if user is authenticated
+
+        // if already liked, remove it
+        if (liked) {
+            await removedLikedPlace(user.uid, randomBusiness);
+        } else {
+            // if disliked, remove dislike first
+            if (disliked) {
+                await removedDislikedPlace(user.uid, randomBusiness);
+                setDisliked(false);
+            }
+
+            await addLikedPlace(user.uid, randomBusiness);
         }
+        setLiked((prev) => !prev); // toggleing liked state
     };
 
     const handleDislike = async () => {
-        setDisliked((prev) => (!prev));
-        if (liked) {
-            setLiked(false);
+        if (!user) return;
+
+        if (disliked) {
+            await removedDislikedPlace(user.uid, randomBusiness);
+        } else {
+            if (liked) {
+                await removedLikedPlace(user.uid, randomBusiness);
+                setLiked(false);
+            }
+            await addDislikedPlace(user.uid, randomBusiness);
         }
+
+        setDisliked((prev) => (!prev));
     }
 
     return (
