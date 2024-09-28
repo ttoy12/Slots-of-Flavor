@@ -1,7 +1,7 @@
 "use client"
 import React from 'react';
 import Image from 'next/image';
-import RouteButton from '@/components/RouteButton';
+import RouteButton from '@/app/components/RouteButton';
 
 export default function Welcome() {
     return (

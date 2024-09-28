@@ -18,3 +18,5 @@ need to configure api a bit for other options.
 randomize option after
 create a way to mark places as visited, and favorites
 figure out how to format page and do styling
+
+check this out for spacing on flex items: https://tailwindcss.com/docs/flex-basis

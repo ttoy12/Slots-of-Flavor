@@ -8,16 +8,21 @@ export async function GET(req: Request) {
     const location = url.searchParams.get("location");
     const term = url.searchParams.get("term");
     const price = url.searchParams.get("price");
+    const distance = url.searchParams.get("distance");
 
-    let apiURL = `https://api.yelp.com/v3/businesses/search?location=${location}&open_now=true&sort_by=best_match&limit=3`;
+    let apiURL = `https://api.yelp.com/v3/businesses/search?location=${location}&open_now=true&sort_by=best_match&limit=20`;
 
     // append term if it exists
     if (term) {
         apiURL += `&term=${term}`
     }
-
+    
     if (price) {
         apiURL += `&price=${price}`
+    }
+    
+    if (distance) {
+        apiURL += `&distance=${distance}`
     }
 
     const options = {
