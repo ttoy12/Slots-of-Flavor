@@ -1,4 +1,4 @@
-import { doc, setDoc, updateDoc, arrayUnion, serverTimestamp, arrayRemove } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, arrayUnion, serverTimestamp, arrayRemove, getDoc } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 
 export interface Business {
@@ -19,8 +19,31 @@ export const addUser = async (userID: string, email: string) => {
     console.log("added user: ", email);
 };
 
+export const getLikedPlaces = async (userID: string) => {
+    const userRef = doc(db, 'users', userID);
+    const userDoc = await getDoc(userRef);
 
-// need to still figure out what the place will be. URL maybe?
+    if (userDoc.exists()) {
+        const data = userDoc.data();
+        return data.liked || [];
+    } else {
+        return [];
+    }
+}
+
+export const getDislikedPlaces = async (userID: string) => {
+    const userRef = doc(db, 'users', userID);
+    const userDoc = await getDoc(userRef);
+
+    if (userDoc.exists()) {
+        const data = userDoc.data();
+        return data.disliked || [];
+    } else {
+        return [];
+    }
+}
+
+
 export const addLikedPlace = async (userID: string, business: Business) => {
     const userRef = doc(db, 'users', userID);
     await updateDoc(userRef, {

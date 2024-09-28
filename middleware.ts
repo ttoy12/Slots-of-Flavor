@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
-    const protectedPaths = ['/'];
+    const protectedPaths = ['/', '/profile'];
     const userSession = request.cookies.get('user');
 
     // console.log('Request Pathname: ', pathname);

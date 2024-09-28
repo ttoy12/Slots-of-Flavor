@@ -2,18 +2,14 @@
 import React from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { auth } from './firebase/firebaseConfig'
-import { useRouter } from 'next/navigation'
-import { signOut } from 'firebase/auth'
-import Cookies from 'js-cookie'
 import { useState } from 'react'
 import axios from 'axios'
-import BusinessList from '@/components/BusinessList'
+import BusinessList from './components/BusinessList'
 import { Checkbox, FormControlLabel } from '@mui/material'
+import ResponsiveAppBar from './components/AppBar'
 
 export default function Home() {
   const [user, loading] = useAuthState(auth);
-  console.log("user id", user?.uid);
-  const router = useRouter();
   const [businesses, setBusinesses] = useState([]);
   const [location, setLocation] = useState<string>("");
   const [distance, setDistance] = useState<string>("");
@@ -44,12 +40,6 @@ export default function Home() {
     }
   }
 
-  const handleLogout = () => {
-    signOut(auth);
-    Cookies.remove('user');
-    router.push('/sign-in');
-  };
-
   const handlePriceChange = (value: string) => {
     setPrice((prev) =>
       prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]
@@ -75,15 +65,15 @@ export default function Home() {
     //   opacity: .8
     // }}
     >
-      <button onClick={handleLogout}>
-        Log Out
-      </button>
-      <h1 className="text-3xl">Home</h1>
-      {user ? (
-        <h2 className="text-xl">Hi, {user?.email}</h2>
-      ) : (
-        <h2 className="text-xl">Hi, Guest</h2>
-      )}
+      <ResponsiveAppBar />
+
+      <span className="mt-2">
+        {user ? (
+          <h2 className="text-xl">Hi, {user?.email}</h2>
+        ) : (
+          <h2 className="text-xl">Hi, Guest</h2>
+        )}
+      </span>
 
       <form onSubmit={handleSubmit} className="space-y-4 p-4 m-4 border rounded-md">
         <input

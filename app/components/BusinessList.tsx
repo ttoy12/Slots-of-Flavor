@@ -6,7 +6,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { useState, useEffect } from 'react';
 import { addLikedPlace, addDislikedPlace, removedLikedPlace, removedDislikedPlace } from '@/app/firebase/firestore';
-import { auth } from '../app/firebase/firebaseConfig';
+import { auth } from '../firebase/firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 export default function BusinessList({ randomBusiness }: any) {
@@ -89,7 +89,7 @@ export default function BusinessList({ randomBusiness }: any) {
                         </Tooltip>
                         {randomBusiness.image_url && (
                             <img
-                                src={`${randomBusiness.image_url}`}
+                                src={randomBusiness.image_url}
                                 alt={`${randomBusiness.name} image`}
                                 style={{ width: '120px', height: '120px', objectFit: 'cover' }}
                             />
