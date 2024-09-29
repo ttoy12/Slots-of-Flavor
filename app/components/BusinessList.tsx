@@ -110,8 +110,8 @@ export default function BusinessList({ randomBusiness }: any) {
                         </Tooltip>
 
                         <div className="flex flex-row">
-                            <ThumbUpIcon className={`mx-2 cursor-pointer ${liked ? 'text-white' : 'text-gray-500'} hover:scale-110 hover:text-white transition duration-200`} onClick={handleLiked} />
-                            <ThumbDownIcon className={`mx-2 cursor-pointer ${disliked ? 'text-white' : 'text-gray-500'}  hover:scale-110 hover:text-white transition duration-200`} onClick={handleDislike} />
+                            <ThumbUpIcon className={`mx-2 cursor-pointer ${liked ? 'text-white' : 'text-gray-400'} hover:scale-110 hover:text-white transition duration-200`} onClick={handleLiked} />
+                            <ThumbDownIcon className={`mx-2 cursor-pointer ${disliked ? 'text-white' : 'text-gray-400'}  hover:scale-110 hover:text-white transition duration-200`} onClick={handleDislike} />
                         </div>
                     </div>
                 ) : (

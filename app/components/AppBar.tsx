@@ -15,23 +15,20 @@ import { useRouter } from 'next/navigation'
 import { signOut } from 'firebase/auth'
 import Cookies from 'js-cookie'
 import Link from 'next/link';
+import PersonIcon from '@mui/icons-material/Person';
+import LogoutIcon from '@mui/icons-material/Logout';
 
-const settings = ['Profile', 'Logout'];
+const settings = [
+    { name: 'Profile', icon: <PersonIcon /> },
+    { name: 'Logout', icon: <LogoutIcon /> },
+];
 
 function ResponsiveAppBar() {
-    const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
     const router = useRouter();
 
-    const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorElNav(event.currentTarget);
-    };
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
-    };
-
-    const handleCloseNavMenu = () => {
-        setAnchorElNav(null);
     };
 
     const handleCloseUserMenu = (setting: string) => {
@@ -97,8 +94,28 @@ function ResponsiveAppBar() {
                             onClose={handleCloseUserMenu}
                         >
                             {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={() => handleCloseUserMenu(setting)}>
-                                    <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                                <MenuItem
+                                    key={setting.name}
+                                    onClick={() => handleCloseUserMenu(setting.name)}
+                                    sx={{
+                                        '&:hover': {
+                                            backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                                        },
+                                    }}
+                                >
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Box
+                                            sx={{
+                                                backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                                                borderRadius: '50%',
+                                                padding: '4px',
+                                                marginRight: '4px',
+                                            }}
+                                        >
+                                            {setting.icon}
+                                        </Box>
+                                        <Typography sx={{ textAlign: 'center' }}>{setting.name}</Typography>
+                                    </Box>
                                 </MenuItem>
                             ))}
                         </Menu>
