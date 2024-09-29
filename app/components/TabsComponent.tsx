@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, Tab } from '@mui/material';
 import { getLikedPlaces, getDislikedPlaces } from '@/app/firebase/firestore';
+import TitlebarImageList from './ImageList';
 
 const TabsComponent: React.FC<{ userID: string }> = ({ userID }) => {
     const [value, setValue] = React.useState(0); // used to see which tab
@@ -38,21 +39,9 @@ const TabsComponent: React.FC<{ userID: string }> = ({ userID }) => {
                     <div className="text-center">
                         <h2 className="text-lg font-semibold">Liked places</h2>
                         {likedPlaces.length > 0 ? (
-                            <ul>
-                                {likedPlaces.map((place) => (
-                                    <a
-                                        href={place.url}
-                                        className="hover:text-green-800 hover:underline transition duration-200"
-                                        rel="noreferrer noopener"
-                                        target="_blank"
-                                    >
-                                        <li key={place.id} className="flex places-center justify-center my-2">
-                                            <img src={place.image_url} alt={place.name} className="h-10 w-10 rounded-full mr-2" />
-                                            <span>{place.name}</span>
-                                        </li>
-                                    </a>
-                                ))}
-                            </ul>
+                            <div>
+                                <TitlebarImageList itemData={[...likedPlaces]} />
+                            </div>
                         ) : (
                             <p>No liked places yet!</p>
                         )}
@@ -62,21 +51,9 @@ const TabsComponent: React.FC<{ userID: string }> = ({ userID }) => {
                     <div className="text-center">
                         <h2 className="text-lg font-semibold">Disliked places</h2>
                         {dislikedPlaces.length > 0 ? (
-                            <ul>
-                                {dislikedPlaces.map((place) => (
-                                    <a
-                                        href={place.url}
-                                        className="hover:text-green-800 hover:underline transition duration-200"
-                                        rel="noreferrer noopener"
-                                        target="_blank"
-                                    >
-                                        <li key={place.id} className="flex places-center justify-center my-2">
-                                            <img src={place.image_url} alt={place.name} className="h-10 w-10 rounded-full mr-2" />
-                                            <span>{place.name}</span>
-                                        </li>
-                                    </a>
-                                ))}
-                            </ul>
+                            <div>
+                                <TitlebarImageList itemData={[...dislikedPlaces]} />
+                            </div>
                         ) : (
                             <p>No disliked places yet!</p>
                         )}

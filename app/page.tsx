@@ -4,7 +4,6 @@ import { useState } from 'react'
 import axios from 'axios'
 import BusinessList from './components/BusinessList'
 import { Checkbox, FormControlLabel } from '@mui/material'
-import ResponsiveAppBar from './components/AppBar'
 import AuthWrapper from './components/AuthWrapper'
 
 export default function Home() {

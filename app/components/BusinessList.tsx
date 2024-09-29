@@ -105,13 +105,13 @@ export default function BusinessList({ randomBusiness }: any) {
                         )}
 
                         <Tooltip title="Share" arrow className="m-2">
-                            <IosShareIcon className="cursor-pointer hover:text-blue-500 hover:scale-105 transition duration-300" fontSize="small" onClick={handleShare} />
+                            <IosShareIcon className="cursor-pointer hover:text-blue-500 hover:scale-105 transition duration-200" fontSize="small" onClick={handleShare} />
                             {/* <ContentCopyIcon fontSize="small" onClick={() => navigator.clipboard.writeText(randomBusiness.url)} /> */}
                         </Tooltip>
 
                         <div className="flex flex-row">
-                            <ThumbUpIcon className={`mx-2 cursor-pointer ${liked ? 'text-white' : 'text-gray-300'} hover:scale-110`} onClick={handleLiked} />
-                            <ThumbDownIcon className={`mx-2 cursor-pointer ${disliked ? 'text-white' : 'text-gray-300'}  hover:scale-110`} onClick={handleDislike} />
+                            <ThumbUpIcon className={`mx-2 cursor-pointer ${liked ? 'text-white' : 'text-gray-500'} hover:scale-110 hover:text-white transition duration-200`} onClick={handleLiked} />
+                            <ThumbDownIcon className={`mx-2 cursor-pointer ${disliked ? 'text-white' : 'text-gray-500'}  hover:scale-110 hover:text-white transition duration-200`} onClick={handleDislike} />
                         </div>
                     </div>
                 ) : (

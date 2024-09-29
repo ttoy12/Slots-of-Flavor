@@ -5,7 +5,14 @@ import TabsComponent from '../components/TabsComponent'
 export default function Profile() {
     return (
         <AuthWrapper>
-            {(user) => <TabsComponent userID={user.uid} />}
+            {(user) => (
+                <>
+                    <div>
+
+                    </div>
+                    <TabsComponent userID={user.uid} />
+                </>
+            )}
         </AuthWrapper>
     )
 }
