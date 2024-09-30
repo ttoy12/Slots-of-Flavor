@@ -3,36 +3,16 @@ import React, { useState, useEffect } from 'react';
 import { Tabs, Tab } from '@mui/material';
 import { getLikedPlaces, getDislikedPlaces } from '@/app/firebase/firestore';
 import TitlebarImageList from './ImageList';
+import getLikedAndDislikedPlaces from './getLikedAndDislikedPlaces';
 
 const TabsComponent: React.FC<{ userID: string }> = ({ userID }) => {
     const [value, setValue] = React.useState(0); // used to see which tab
-    const [likedPlaces, setLikedPlaces] = useState<any[]>([]);
-    const [dislikedPlaces, setDislikedPlaaces] = useState<any[]>([]);
-    const [shouldUpdate, setShouldUpdate] = useState<boolean>(false);
+    const { likedPlaces, dislikedPlaces, handleUpdate } = getLikedAndDislikedPlaces(userID);
 
     // change tabs
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
-
-    useEffect(() => {
-        const fetchLikedPlaces = async () => {
-            const liked = await getLikedPlaces(userID);
-            setLikedPlaces(liked);
-        };
-
-        const fetchDislikedPlaces = async () => {
-            const disliked = await getDislikedPlaces(userID);
-            setDislikedPlaaces(disliked);
-        };
-
-        fetchLikedPlaces();
-        fetchDislikedPlaces();
-    }, [userID, shouldUpdate]);
-
-    const handleUpdate = () => {
-        setShouldUpdate(prev => !prev);
-    }
 
     return (
         <div className="w-full max-w-3xl mx-auto bg-white rounded-md shadow-lg">
