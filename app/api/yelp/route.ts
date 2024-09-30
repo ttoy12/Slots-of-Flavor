@@ -10,7 +10,7 @@ export async function GET(req: Request) {
     const price = url.searchParams.get("price");
     const distance = url.searchParams.get("distance");
 
-    let apiURL = `https://api.yelp.com/v3/businesses/search?location=${location}&open_now=true&sort_by=best_match&limit=20`;
+    let apiURL = `https://api.yelp.com/v3/businesses/search?location=${location}&open_now=true&sort_by=best_match&limit=50`;
 
     // append term if it exists
     if (term) {
