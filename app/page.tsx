@@ -6,6 +6,7 @@ import { Checkbox, FormControlLabel } from '@mui/material';
 import AuthWrapper from './components/AuthWrapper';
 import useFetchLikedAndDislikedPlaces from './hooks/useFetchLikedAndDislikedPlaces';
 import { Business } from './firebase/firestore';
+import { useUser } from './components/UserContext';
 
 export default function Home() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
@@ -14,52 +15,54 @@ export default function Home() {
   const [term, setTerm] = useState<string>("");
   const [price, setPrice] = useState<string[]>([]);
   const [randomBusiness, setRandomBusiness] = useState<Business | null>(null);
+  const user = useUser();
+
+  const { likedPlaces, dislikedPlaces } = useFetchLikedAndDislikedPlaces(user?.uid);
+
+  const getBusinessList = async (location: string) => {
+    try {
+      const url = `/api/yelp?location=${location}${term ? `&term=${term}` : ''}${price.length ? `&price=${price.join(',')}` : ''}${distance ? `&distance=${distance}` : ''}`;
+      const response = await axios.get(url);
+      const data: Business[] = await response.data;
+
+      if (data && data.length > 0) {
+        const filteredData = data.filter(business => !dislikedPlaces.some(disliked => disliked.id === business.id));
+
+        setBusinesses(filteredData);
+        setRandomBusiness(filteredData[Math.floor(Math.random() * filteredData.length)]);
+        // console.log(filteredData);
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (location.trim()) {
+      getBusinessList(location);
+    }
+  };
+
+  const handlePriceChange = (value: string) => {
+    setPrice((prev) =>
+      prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]
+    );
+  };
+
+  const handlePriceAnyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setPrice(["1", "2", "3", "4"]);
+    } else {
+      setPrice([]);
+    }
+  };
+
 
   return (
     <AuthWrapper>
       {(user) => {
-        const { likedPlaces, dislikedPlaces } = useFetchLikedAndDislikedPlaces(user?.uid);
-
-        const getBusinessList = async (location: string) => {
-          try {
-            const url = `/api/yelp?location=${location}${term ? `&term=${term}` : ''}${price.length ? `&price=${price.join(',')}` : ''}${distance ? `&distance=${distance}` : ''}`;
-            const response = await axios.get(url);
-            const data: Business[] = await response.data;
-
-            if (data && data.length > 0) {
-              const filteredData = data.filter(business => !dislikedPlaces.some(disliked => disliked.id === business.id));
-
-              setBusinesses(filteredData);
-              setRandomBusiness(filteredData[Math.floor(Math.random() * filteredData.length)]);
-              // console.log(filteredData);
-            }
-
-          } catch (error) {
-            console.log(error);
-          }
-        };
-
-        const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-          e.preventDefault();
-          if (location.trim()) {
-            getBusinessList(location);
-          }
-        };
-
-        const handlePriceChange = (value: string) => {
-          setPrice((prev) =>
-            prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]
-          );
-        };
-
-        const handlePriceAnyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-          if (e.target.checked) {
-            setPrice(["1", "2", "3", "4"]);
-          } else {
-            setPrice([]);
-          }
-        };
-
         return (
           <>
             <span className="mt-2">
