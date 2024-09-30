@@ -144,7 +144,7 @@ const SignIn: React.FC = () => {
                 </button>
                 {error && <p className="text-red-500 mt-3">{error.message}</p>}
                 <p className="text-center text-gray-400 mt-4">
-                    Don't have an account?&nbsp;
+                    Don&apos;t have an account?&nbsp;
                     <Link href="/sign-up" className="text-indigo-500 hover:underline">
                         Click here to sign up
                     </Link>
