@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react';
 import { getLikedPlaces, getDislikedPlaces } from '../firebase/firestore';
 
-const getLikedAndDislikedPlaces = (userID: string) => {
+const useFetchLikedAndDislikedPlaces = (userID?: string | null) => {
     const [likedPlaces, setLikedPlaces] = useState<any[]>([]);
     const [dislikedPlaces, setDislikedPlaces] = useState<any[]>([]);
     const [shouldUpdate, setShouldUpdate] = useState<boolean>(false);
 
     useEffect(() => {
+        if (!userID) {
+            setLikedPlaces([]);
+            setDislikedPlaces([]);
+            return;
+        }
+
         const fetchLikedPlaces = async () => {
             const liked = await getLikedPlaces(userID);
             setLikedPlaces(liked);
@@ -28,4 +34,4 @@ const getLikedAndDislikedPlaces = (userID: string) => {
     return { likedPlaces, dislikedPlaces, handleUpdate };
 };
 
-export default getLikedAndDislikedPlaces;
+export default useFetchLikedAndDislikedPlaces;

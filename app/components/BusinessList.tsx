@@ -5,20 +5,22 @@ import { Tooltip } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { useState, useEffect } from 'react';
-import { addLikedPlace, addDislikedPlace, removedLikedPlace, removedDislikedPlace } from '@/app/firebase/firestore';
+import { addLikedPlace, addDislikedPlace, removedLikedPlace, removedDislikedPlace, Business } from '@/app/firebase/firestore';
 import { auth } from '../firebase/firebaseConfig';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
-export default function BusinessList({ randomBusiness }: any) {
+export default function BusinessList({ randomBusiness, likedPlaces }: any) {
     const [user, loading] = useAuthState(auth);
     const [liked, setLiked] = useState<boolean>(false);
     const [disliked, setDisliked] = useState<boolean>(false);
 
     // Reset liked and disliked states when randomBusiness changes
     useEffect(() => {
-        setLiked(false);
-        setDisliked(false);
-    }, [randomBusiness]);
+        if (randomBusiness) {
+            setLiked(likedPlaces.some((liked: Business) => liked.id === randomBusiness.id))
+            setDisliked(false);
+        }
+    }, [randomBusiness, likedPlaces]);
 
     const handleShare = async () => {
         if (navigator.share) {
@@ -110,8 +112,8 @@ export default function BusinessList({ randomBusiness }: any) {
                         </Tooltip>
 
                         <div className="flex flex-row">
-                            <ThumbUpIcon className={`mx-2 cursor-pointer ${liked ? 'text-white' : 'text-gray-400'} hover:scale-110 hover:text-white transition duration-200`} onClick={handleLiked} />
-                            <ThumbDownIcon className={`mx-2 cursor-pointer ${disliked ? 'text-white' : 'text-gray-400'}  hover:scale-110 hover:text-white transition duration-200`} onClick={handleDislike} />
+                            <ThumbUpIcon className={`mx-2 cursor-pointer ${liked ? 'text-white' : 'text-gray-400'} hover:scale-110 hover:text-white`} onClick={handleLiked} />
+                            <ThumbDownIcon className={`mx-2 cursor-pointer ${disliked ? 'text-white' : 'text-gray-400'}  hover:scale-110 hover:text-white`} onClick={handleDislike} />
                         </div>
                     </div>
                 ) : (

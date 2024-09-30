@@ -1,13 +1,12 @@
 "use client"
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Tabs, Tab } from '@mui/material';
-import { getLikedPlaces, getDislikedPlaces } from '@/app/firebase/firestore';
 import TitlebarImageList from './ImageList';
-import getLikedAndDislikedPlaces from './getLikedAndDislikedPlaces';
+import useFetchLikedAndDislikedPlaces from '../hooks/useFetchLikedAndDislikedPlaces';
 
 const TabsComponent: React.FC<{ userID: string }> = ({ userID }) => {
     const [value, setValue] = React.useState(0); // used to see which tab
-    const { likedPlaces, dislikedPlaces, handleUpdate } = getLikedAndDislikedPlaces(userID);
+    const { likedPlaces, dislikedPlaces, handleUpdate } = useFetchLikedAndDislikedPlaces(userID);
 
     // change tabs
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
