@@ -51,19 +51,19 @@ function ResponsiveAppBar() {
     };
 
     return (
-        <AppBar position="static">
+        <AppBar position="static" sx={{ zIndex: 1000 }}>
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
-                    <Link href="/">
+                    <Link href="/" className="hover:text-yellow-500">
                         <Typography
                             variant="h5"
                             noWrap
                             sx={{
                                 mr: 2,
                                 flexGrow: 1,
-                                fontFamily: 'monospace',
+                                fontFamily: 'Segoe UI Emoji',
                                 fontWeight: 700,
-                                letterSpacing: '.3rem',
+                                letterSpacing: '.2rem',
                                 color: 'inherit',
                             }}
                         >

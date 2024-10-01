@@ -80,7 +80,7 @@ const TitlebarImageList: React.FC<TitlebarImageListProps> = ({ itemData, isLiked
 
     return (
         <>
-            <ImageList sx={{ width: 500, height: 450 }}>
+            <ImageList sx={{ width: '100%', height: 'auto', maxHeight: 450 }}>
                 {itemData.map((item) => (
                     <ImageListItem key={item.name} sx={{}}>
                         <img
@@ -88,7 +88,7 @@ const TitlebarImageList: React.FC<TitlebarImageListProps> = ({ itemData, isLiked
                             src={`${item.image_url}?w=100&fit=crop&auto=format`}
                             alt={item.name}
                             loading="lazy"
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            style={{ width: 'auto', height: 'auto', objectFit: 'cover' }}
                         />
                         <ImageListItemBar
                             title={item.name}
