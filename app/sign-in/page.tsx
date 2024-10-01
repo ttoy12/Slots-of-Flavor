@@ -13,6 +13,7 @@ import { addUser } from '../firebase/firestore';
 import { db } from '@/app/firebase/firebaseConfig';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Button, TextField, Typography, Box, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 
 
 const SignIn: React.FC = () => {
@@ -96,42 +97,51 @@ const SignIn: React.FC = () => {
     // }, [router]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-900 w-full" >
-            <Image src="/Slots of Flavors png.png" alt="SOF logo" height={350} width={350} className='rounded-lg' />
-            <div className="p-10 w-1/2">
-                <h1 className="text-white text-2xl mb-5">Sign In</h1>
-                <input
-                    type="email"
+        <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Box sx={{ padding: 4, maxWidth: 400, borderRadius: 2, boxShadow: 3, backgroundColor: '#f7f7f7' }}>
+                <Image src="/Slots of Flavors png.png" alt="SOF logo" height={150} width={150} className='rounded-lg mx-auto' />
+                <Typography variant="h4" component="h2" gutterBottom align="center">
+                    Sign In
+                </Typography>
+                <TextField
+                    fullWidth
+                    variant="outlined"
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
+                    margin="normal"
                 />
-                <div className="relative mb-4">
-                    <input
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
-                    />
-                    <span
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-3 cursor-pointer"
-                    >
-                        {showPassword ? <VisibilityIcon className="text-gray-500 hover:text-white" /> : <VisibilityOffIcon className="text-gray-500 hover:text-white" />}
-                    </span>
-                </div>
-                <button
+                <TextField
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    margin="normal"
+                    InputProps={{
+                        endAdornment: (
+                            <IconButton onClick={() => setShowPassword(!showPassword)}>
+                                {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                            </IconButton>
+                        ),
+                    }}
+                />
+                <Button
                     onClick={handleSignIn}
-                    className="w-full p-3 bg-indigo-600 rounded text-white hover:bg-indigo-500"
-                    disabled={loading} // Optional: disable button while loading
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    sx={{ marginTop: 2 }}
+                    disabled={loading}
                 >
                     Sign In
-                </button>
-                <button
+                </Button>
+                <Button
                     onClick={handleGoogleSignIn}
-                    className="w-full p-3 mt-4 bg-white rounded flex items-center justify-center border border-gray-300 hover:bg-gray-100"
+                    variant="outlined"
+                    fullWidth
+                    sx={{ marginTop: 2 }}
                 >
                     <Image
                         src="/google-icon.png"
@@ -140,48 +150,39 @@ const SignIn: React.FC = () => {
                         height={20}
                         className="mr-2"
                     />
-                    <span className="text-gray-800 font-medium">Sign in with Google</span>
-                </button>
-                {error && <p className="text-red-500 mt-3">{error.message}</p>}
-                <p className="text-center text-gray-400 mt-4">
-                    Don&apos;t have an account?&nbsp;
-                    <Link href="/sign-up" className="text-indigo-500 hover:underline">
-                        Click here to sign up
-                    </Link>
-                </p>
-                <p className="text-center text-gray-400 mt-4 cursor-pointer hover:underline" onClick={() => setShowResetModal(true)}>
+                    Sign in with Google
+                </Button>
+                {error && <Typography color="error" variant="body2" align="center" sx={{ marginTop: 2 }}>{error.message}</Typography>}
+                <Typography variant="body2" align="center" sx={{ marginTop: 2 }}>
+                    Don't have an account? <Link href="/sign-up" className="hover:text-blue-500 hover:underline">Click here to sign up</Link>
+                </Typography>
+                <Typography variant="body2" align="center" sx={{ marginTop: 2, cursor: 'pointer' }}
+                    className="hover:text-blue-500 hover:underline"
+                    onClick={() => setShowResetModal(true)}>
                     Forgot password?
-                </p>
-            </div>
+                </Typography>
+            </Box>
 
-            {showResetModal && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white p-5 rounded shadow-lg">
-                        <h2 className="text-lg font-semibold mb-4">Reset Password</h2>
-                        <input
-                            type="email"
-                            placeholder="Enter your email"
-                            value={resetEmail}
-                            onChange={(e) => setResetEmail(e.target.value)}
-                            className="w-full p-3 mb-4 border border-gray-300 rounded"
-                        />
-                        <button
-                            onClick={handleResetPassword}
-                            className="w-full p-3 bg-indigo-600 text-white rounded hover:bg-indigo-500"
-                        >
-                            Send Reset Email
-                        </button>
-                        <button
-                            onClick={() => setShowResetModal(false)}
-                            className="w-full p-3 mt-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
-                        >
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-            )}
-        </div>
+            <Dialog open={showResetModal} onClose={() => setShowResetModal(false)}>
+                <DialogTitle>Reset Password</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        fullWidth
+                        placeholder="Enter your email"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        variant="outlined"
+                        margin="normal"
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleResetPassword} color="primary">Send Reset Email</Button>
+                    <Button onClick={() => setShowResetModal(false)}>Cancel</Button>
+                </DialogActions>
+            </Dialog>
+        </Box>
     );
 };
+
 
 export default SignIn;

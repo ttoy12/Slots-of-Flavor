@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Button, TextField, Typography, Box, IconButton } from '@mui/material';
 
 const SignUp: React.FC = () => {
     const [email, setEmail] = useState<string>('');
@@ -21,13 +22,12 @@ const SignUp: React.FC = () => {
     const handleSignUp = async () => {
         try {
             const res = await createUserWithEmailAndPassword(email, password);
-            // console.log({ res });
             if (res?.user) {
                 await addUser(res.user.uid, email);
-                Cookies.set('user', JSON.stringify({ email }), { expires: 7 }); // Expires in 7 days
+                Cookies.set('user', JSON.stringify({ email }), { expires: 7 });
                 setEmail('');
                 setPassword('');
-                router.push('/sign-in')
+                router.push('/sign-in');
             }
         } catch (e) {
             console.error(e);
@@ -35,48 +35,52 @@ const SignUp: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-900 w-full">
-            <Image src="/Slots of Flavors png.png" alt="SOF logo" height={350} width={350} className='rounded-lg' />
-            <div className="p-10 w-1/2">
-                <h1 className="text-white text-2xl mb-5">Sign Up</h1>
-                <input
-                    type="email"
+        <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#e0e0e0' }}>
+            <Box sx={{ padding: 4, maxWidth: 400, borderRadius: 2, boxShadow: 3, backgroundColor: '#fff' }}>
+                <Image src="/Slots of Flavors png.png" alt="SOF logo" height={150} width={150} className='rounded-lg mx-auto' />
+                <Typography variant="h4" component="h2" gutterBottom align="center">
+                    Sign Up
+                </Typography>
+                <TextField
+                    fullWidth
+                    variant="outlined"
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
+                    margin="normal"
                 />
-                <div className="relative mb-4">
-                    <input
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
-                    />
-                    <span
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-3 cursor-pointer"
-                    >
-                        {showPassword ? <VisibilityIcon className="text-gray-500 hover:text-white" /> : <VisibilityOffIcon className="text-gray-500 hover:text-white" />}
-                    </span>
-                </div>
-                <button
+                <TextField
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    margin="normal"
+                    InputProps={{
+                        endAdornment: (
+                            <IconButton onClick={() => setShowPassword(!showPassword)}>
+                                {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                            </IconButton>
+                        ),
+                    }}
+                />
+                <Button
                     onClick={handleSignUp}
-                    className="w-full p-3 bg-indigo-600 rounded text-white hover:bg-indigo-500"
-                    disabled={loading} // Optional: disable button while loading
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    sx={{ marginTop: 2 }}
+                    disabled={loading}
                 >
                     Sign Up
-                </button>
-                {error && <p className="text-red-500 mt-3">{error.message}</p>}
-                <p className="text-center text-gray-400 mt-4">
-                    Already have an account?&nbsp;
-                    <Link href="/sign-in" className="text-indigo-500 hover:underline">
-                        Click here to log in
-                    </Link>
-                </p>
-            </div>
-        </div>
+                </Button>
+                {error && <Typography color="error" variant="body2" align="center" sx={{ marginTop: 2 }}>{error.message}</Typography>}
+                <Typography variant="body2" align="center" sx={{ marginTop: 2 }}>
+                    Already have an account? <Link href="/sign-in" className="hover:text-blue-500 hover:underline">Click here to log in</Link>
+                </Typography>
+            </Box>
+        </Box>
     );
 };
 

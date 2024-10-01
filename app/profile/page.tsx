@@ -1,18 +1,28 @@
-"use client"
-import AuthWrapper from '../components/AuthWrapper'
-import TabsComponent from '../components/TabsComponent'
+"use client";
+import AuthWrapper from '../components/AuthWrapper';
+import TabsComponent from '../components/TabsComponent';
+import { Box, Typography } from '@mui/material';
 
 export default function Profile() {
     return (
         <AuthWrapper>
             {(user) => (
-                <>
-                    <div>
-
-                    </div>
+                <Box
+                    sx={{
+                        padding: 4,
+                        maxWidth: 600,
+                        margin: 'auto',
+                        borderRadius: 2,
+                        boxShadow: 3,
+                        backgroundColor: '#f7f7f7'
+                    }}
+                >
+                    <Typography variant="h4" component="h1" gutterBottom>
+                        {user.email}
+                    </Typography>
                     <TabsComponent userID={user.uid} />
-                </>
+                </Box>
             )}
         </AuthWrapper>
-    )
+    );
 }

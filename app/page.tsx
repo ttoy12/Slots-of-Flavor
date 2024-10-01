@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import BusinessList from './components/BusinessList';
-import { Checkbox, FormControlLabel } from '@mui/material';
+import { Checkbox, FormControlLabel, TextField, Button, Typography, Box, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 import AuthWrapper from './components/AuthWrapper';
 import useFetchLikedAndDislikedPlaces from './hooks/useFetchLikedAndDislikedPlaces';
 import { Business } from './firebase/firestore';
@@ -16,7 +16,6 @@ export default function Home() {
   const [price, setPrice] = useState<string[]>([]);
   const [randomBusiness, setRandomBusiness] = useState<Business | null>(null);
   const user = useUser();
-
   const { likedPlaces, dislikedPlaces } = useFetchLikedAndDislikedPlaces(user?.uid);
 
   const getBusinessList = async (location: string) => {
@@ -27,10 +26,8 @@ export default function Home() {
 
       if (data && data.length > 0) {
         const filteredData = data.filter(business => !dislikedPlaces.some(disliked => disliked.id === business.id));
-
         setBusinesses(filteredData);
         setRandomBusiness(filteredData[Math.floor(Math.random() * filteredData.length)]);
-        // console.log(filteredData);
       }
 
     } catch (error) {
@@ -59,95 +56,98 @@ export default function Home() {
     }
   };
 
-
   return (
     <AuthWrapper>
-      {(user) => {
-        return (
-          <>
-            <span className="mt-2">
-              {user ? <h2 className="text-xl">Hi, {user.email}</h2> : <h2 className="text-xl">Hi, Guest</h2>}
-            </span>
+      {(user) => (
+        <Box sx={{ padding: 3, maxWidth: 600, margin: 'auto', borderRadius: 2, boxShadow: 3, backgroundColor: '#f7f7f7' }}>
+          <Typography variant="h4" component="h2" gutterBottom align="center">
+            {user ? `Hi, ${user.email}` : "Hi, Guest"}
+          </Typography>
 
-            <form onSubmit={handleSubmit} className="space-y-4 p-4 m-4 border rounded-md">
-              <input
-                type="text"
-                placeholder="Enter a location (City or Zipcode)"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                required
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Enter a location (City or Zipcode)"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              required
+              margin="normal"
+            />
 
-              <div>
-                <select
-                  id="distance"
-                  value={distance}
-                  onChange={(e) => setDistance(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select distance</option>
-                  <option value="1610">~1 mile</option>
-                  <option value="8047">~5 miles</option>
-                  <option value="16094">~10 miles</option>
-                  <option value="24140">~15 miles</option>
-                  <option value="32187">~20 miles</option>
-                  <option value="40000">~25 miles</option>
-                </select>
-              </div>
+            <FormControl fullWidth margin="normal">
+              <InputLabel id="distance-label">Select Distance</InputLabel>
+              <Select
+                labelId="distance-label"
+                value={distance}
+                onChange={(e) => setDistance(e.target.value)}
+                label="Select Distance"
+              >
+                <MenuItem value=""><em>None</em></MenuItem>
+                <MenuItem value="1610">~1 mile</MenuItem>
+                <MenuItem value="8047">~5 miles</MenuItem>
+                <MenuItem value="16094">~10 miles</MenuItem>
+                <MenuItem value="24140">~15 miles</MenuItem>
+                <MenuItem value="32187">~20 miles</MenuItem>
+                <MenuItem value="40000">~25 miles</MenuItem>
+              </Select>
+            </FormControl>
 
-              <input
-                type="text"
-                placeholder="What type of place? (e.g. bar, Chinese, Mexican)"
-                value={term}
-                onChange={(e) => setTerm(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="What type of place? (e.g. bar, Chinese, Mexican)"
+              value={term}
+              onChange={(e) => setTerm(e.target.value)}
+              margin="normal"
+            />
 
-              <div className="flex justify-center">
-                {["1", "2", "3", "4"].map((value) => (
-                  <FormControlLabel
-                    key={value}
-                    control={
-                      <Checkbox
-                        checked={price.includes(value)}
-                        onChange={() => handlePriceChange(value)}
-                        color="success"
-                      />
-                    }
-                    label={value === "1" ? "$" : value === "2" ? "$$" : value === "3" ? "$$$" : "$$$$"}
-                  />
-                ))}
+            <Box display="flex" justifyContent="space-between" flexWrap="wrap">
+              {["1", "2", "3", "4"].map((value) => (
                 <FormControlLabel
+                  key={value}
                   control={
                     <Checkbox
-                      checked={price.length === 4}
-                      onChange={handlePriceAnyChange}
-                      color="success"
+                      checked={price.includes(value)}
+                      onChange={() => handlePriceChange(value)}
+                      color="primary"
                     />
                   }
-                  label="Any"
+                  label={value === "1" ? "$" : value === "2" ? "$$" : value === "3" ? "$$$" : "$$$$"}
                 />
-              </div>
+              ))}
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={price.length === 4}
+                    onChange={handlePriceAnyChange}
+                    color="primary"
+                  />
+                }
+                label="Any"
+              />
+            </Box>
 
-              <button
-                type="submit"
-                className="w-full bg-blue-600 rounded-md hover:bg-blue-900 transition duration-200"
-              >
-                Search
-              </button>
-            </form>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ marginTop: 2 }}
+            >
+              Search
+            </Button>
+          </form>
 
-            <div className="flex justify-center items-center pb-4">
-              {businesses.length === 0 ? (
-                <div>No businesses found.</div> // Add a message for no results
-              ) : (
-                <BusinessList randomBusiness={randomBusiness} likedPlaces={likedPlaces} className="" />
-              )}
-            </div>
-          </>
-        );
-      }}
+          <Box display="flex" justifyContent="center" className="mt-4">
+            {businesses.length === 0 ? (
+              <Typography variant="body1">No businesses found.</Typography>
+            ) : (
+              <BusinessList randomBusiness={randomBusiness} likedPlaces={likedPlaces} />
+            )}
+          </Box>
+        </Box>
+      )}
     </AuthWrapper>
   );
 }
