@@ -15,16 +15,12 @@ import { useRouter } from 'next/navigation'
 import { signOut } from 'firebase/auth'
 import Cookies from 'js-cookie'
 import Link from 'next/link';
-<<<<<<< Updated upstream
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
-=======
-import Image from 'next/image';
->>>>>>> Stashed changes
 
 const settings = [
-    { name: 'Profile' },
-    { name: 'Logout' },
+    { name: 'Profile', icon: <PersonIcon /> },
+    { name: 'Logout', icon: <LogoutIcon /> },
 ];
 
 function ResponsiveAppBar() {
@@ -108,7 +104,7 @@ function ResponsiveAppBar() {
                                     }}
                                 >
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {/* <Box
+                                        <Box
                                             sx={{
                                                 backgroundColor: 'rgba(0, 0, 0, 0.2)',
                                                 borderRadius: '50%',
@@ -117,7 +113,7 @@ function ResponsiveAppBar() {
                                             }}
                                         >
                                             {setting.icon}
-                                        </Box> */}
+                                        </Box>
                                         <Typography sx={{ textAlign: 'center' }}>{setting.name}</Typography>
                                     </Box>
                                 </MenuItem>
