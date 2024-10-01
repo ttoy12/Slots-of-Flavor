@@ -17,6 +17,7 @@ import Cookies from 'js-cookie'
 import Link from 'next/link';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
+import Image from 'next/image';
 
 const settings = [
     { name: 'Profile', icon: <PersonIcon /> },
@@ -52,10 +53,10 @@ function ResponsiveAppBar() {
 
     return (
         <AppBar position="static" sx={{ zIndex: 1000 }}>
-            <Container maxWidth="xl">
+            <Container maxWidth="xl" sx={{ padding: 2 }}>
                 <Toolbar disableGutters>
                     <Link href="/" className="hover:text-yellow-500">
-                        <Typography
+                        {/* <Typography
                             variant="h5"
                             noWrap
                             sx={{
@@ -68,13 +69,16 @@ function ResponsiveAppBar() {
                             }}
                         >
                             Slots of Flavor
-                        </Typography>
+                        </Typography> */}
+                        <Image src="/slots-of-flavor-high-resolution-logo-transparent.png" alt="logo" height={250} width={250}
+                            className="hover:bg-yellow-500"
+                        />
                     </Link>
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar />
+                                <Avatar className="hover:bg-yellow-500" />
                             </IconButton>
                         </Tooltip>
                         <Menu

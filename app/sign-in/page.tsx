@@ -99,10 +99,14 @@ const SignIn: React.FC = () => {
     return (
         <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Box sx={{ padding: 4, maxWidth: 400, borderRadius: 2, boxShadow: 3, backgroundColor: '#f7f7f7' }}>
-                <Image src="/Slots of Flavors png.png" alt="SOF logo" height={150} width={150} className='rounded-lg mx-auto' />
-                <Typography variant="h4" component="h2" gutterBottom align="center">
-                    Sign In
-                </Typography>
+                <Image
+                    src="/slots-of-flavor-high-resolution-logo-transparent.png"
+                    alt="logo"
+                    height={500}
+                    width={500}
+                    style={{ marginBottom: '20px' }}
+                />
+
                 <TextField
                     fullWidth
                     variant="outlined"
@@ -154,7 +158,7 @@ const SignIn: React.FC = () => {
                 </Button>
                 {error && <Typography color="error" variant="body2" align="center" sx={{ marginTop: 2 }}>{error.message}</Typography>}
                 <Typography variant="body2" align="center" sx={{ marginTop: 2 }}>
-                    Don't have an account? <Link href="/sign-up" className="hover:text-blue-500 hover:underline">Click here to sign up</Link>
+                    Don&apos;t have an account? <Link href="/sign-up" className="hover:text-blue-500 hover:underline">Click here to sign up</Link>
                 </Typography>
                 <Typography variant="body2" align="center" sx={{ marginTop: 2, cursor: 'pointer' }}
                     className="hover:text-blue-500 hover:underline"
