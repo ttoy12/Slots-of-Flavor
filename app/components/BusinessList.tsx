@@ -1,5 +1,4 @@
-"use client"
-// import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+"use client";
 import IosShareIcon from '@mui/icons-material/IosShare';
 import { Tooltip } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
@@ -17,7 +16,7 @@ export default function BusinessList({ randomBusiness, likedPlaces }: any) {
     // Reset liked and disliked states when randomBusiness changes
     useEffect(() => {
         if (randomBusiness) {
-            setLiked(likedPlaces.some((liked: Business) => liked.id === randomBusiness.id))
+            setLiked(likedPlaces.some((liked: Business) => liked.id === randomBusiness.id));
             setDisliked(false);
         }
     }, [randomBusiness, likedPlaces]);
@@ -38,21 +37,18 @@ export default function BusinessList({ randomBusiness, likedPlaces }: any) {
     };
 
     const handleLiked = async () => {
-        if (!user) return; // checking if user is authenticated
+        if (!user) return;
 
-        // if already liked, remove it
         if (liked) {
             await removedLikedPlace(user.uid, randomBusiness);
         } else {
-            // if disliked, remove dislike first
             if (disliked) {
                 await removedDislikedPlace(user.uid, randomBusiness);
                 setDisliked(false);
             }
-
             await addLikedPlace(user.uid, randomBusiness);
         }
-        setLiked((prev) => !prev); // toggleing liked state
+        setLiked((prev) => !prev);
     };
 
     const handleDislike = async () => {
@@ -68,58 +64,60 @@ export default function BusinessList({ randomBusiness, likedPlaces }: any) {
             await addDislikedPlace(user.uid, randomBusiness);
         }
 
-        setDisliked((prev) => (!prev));
-    }
+        setDisliked((prev) => !prev);
+    };
 
     return (
-        <div className="z-20 container p-2">
-            <div>
-                {randomBusiness ? (
-                    <div className='text-white flex flex-col justify-center items-center'>
-                        <Tooltip title={randomBusiness.url} arrow>
-                            <a
-                                href={randomBusiness.url}
-                                className="hover:text-green-800 hover:underline transition duration-200"
-                                rel="noreferrer noopener"
-                                target="_blank"
-                            >
-                                <p className="font-semibold text-[24px] ">
-
-                                    {randomBusiness.name}
+        <div className="z-20 container p-4 bg-white shadow-lg rounded-lg">
+            {randomBusiness ? (
+                <div className='flex flex-col items-center text-gray-800'>
+                    <Tooltip title={randomBusiness.url} arrow>
+                        <a
+                            href={randomBusiness.url}
+                            className="hover:text-blue-600 hover:underline transition duration-200"
+                            rel="noreferrer noopener"
+                            target="_blank"
+                        >
+                            <p className="font-semibold text-lg mb-2">
+                                {randomBusiness.name}
+                            </p>
+                        </a>
+                    </Tooltip>
+                    {randomBusiness.image_url && (
+                        <img
+                            src={randomBusiness.image_url}
+                            alt={`${randomBusiness.name} image`}
+                            className="w-32 h-32 object-cover rounded-md mb-2"
+                        />
+                    )}
+                    {randomBusiness.location && (
+                        <div className="text-center mb-2">
+                            {randomBusiness.location.display_address.map((line: string, index: number) => (
+                                <p key={index} className="text-sm">
+                                    {line}
                                 </p>
-                            </a>
-                        </Tooltip>
-                        {randomBusiness.image_url && (
-                            <img
-                                src={randomBusiness.image_url}
-                                alt={`${randomBusiness.name} image`}
-                                style={{ width: '120px', height: '120px', objectFit: 'cover' }}
-                            />
-                        )}
-                        {randomBusiness.location && (
-                            <div>
-                                {randomBusiness.location.display_address.map((line: string, index: number) => (
-                                    <p key={index}>
-                                        {line}
-                                    </p>
-                                ))}
-                            </div>
-                        )}
-
-                        <Tooltip title="Share" arrow className="m-2">
-                            <IosShareIcon className="cursor-pointer hover:text-blue-500 hover:scale-105 transition duration-200" fontSize="small" onClick={handleShare} />
-                            {/* <ContentCopyIcon fontSize="small" onClick={() => navigator.clipboard.writeText(randomBusiness.url)} /> */}
-                        </Tooltip>
-
-                        <div className="flex flex-row">
-                            <ThumbUpIcon className={`mx-2 cursor-pointer ${liked ? 'text-white' : 'text-gray-400'} hover:scale-110 hover:text-white`} onClick={handleLiked} />
-                            <ThumbDownIcon className={`mx-2 cursor-pointer ${disliked ? 'text-white' : 'text-gray-400'}  hover:scale-110 hover:text-white`} onClick={handleDislike} />
+                            ))}
                         </div>
+                    )}
+
+                    <Tooltip title="Share" arrow>
+                        <IosShareIcon className="cursor-pointer hover:text-blue-500 transition duration-200" fontSize="medium" onClick={handleShare} />
+                    </Tooltip>
+
+                    <div className="flex justify-center mt-2">
+                        <ThumbUpIcon
+                            className={`mx-2 cursor-pointer ${liked ? 'text-green-600' : 'text-gray-400'} hover:scale-110`}
+                            onClick={handleLiked}
+                        />
+                        <ThumbDownIcon
+                            className={`mx-2 cursor-pointer ${disliked ? 'text-red-600' : 'text-gray-400'} hover:scale-110`}
+                            onClick={handleDislike}
+                        />
                     </div>
-                ) : (
-                    <div className='text-white'>No businesses found. Explore different search queries.</div>
-                )}
-            </div>
+                </div>
+            ) : (
+                <div className='text-gray-500'>No businesses found. Explore different search queries.</div>
+            )}
         </div>
     );
 }

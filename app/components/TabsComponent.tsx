@@ -1,63 +1,80 @@
-"use client"
+"use client";
 import React from 'react';
-import { Tabs, Tab } from '@mui/material';
+import { Tabs, Tab, Box, Typography } from '@mui/material';
 import TitlebarImageList from './ImageList';
 import useFetchLikedAndDislikedPlaces from '../hooks/useFetchLikedAndDislikedPlaces';
 
 const TabsComponent: React.FC<{ userID: string }> = ({ userID }) => {
-    const [value, setValue] = React.useState(0); // used to see which tab
+    const [value, setValue] = React.useState(0);
     const { likedPlaces, dislikedPlaces, handleUpdate } = useFetchLikedAndDislikedPlaces(userID);
 
-    // change tabs
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
 
     return (
-        <div className="w-full max-w-3xl mx-auto bg-white rounded-md shadow-lg">
-            <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
-                <Tab label="Liked" />
-                <Tab label="Disliked" />
+        <Box sx={{
+            width: '100%',
+            maxWidth: 600,
+            margin: 'auto',
+            backgroundColor: '#f7f7f7',
+        }}>
+            <Tabs
+                value={value}
+                onChange={handleChange}
+                aria-label="User Liked and Disliked Places"
+                sx={{
+                    borderBottom: 1,
+                    borderColor: 'divider',
+                    '& .MuiTab-root': {
+                        color: 'text.primary',
+                        '&.Mui-selected': {
+                            color: 'primary.main',
+                        },
+                    },
+                }}
+            >
+                <Tab label="Liked" className="hover:bg-gray-200" />
+                <Tab label="Disliked" className="hover:bg-gray-200" />
             </Tabs>
-            <div className="p-4">
+            <Box>
                 {value === 0 && (
-                    <div className="text-center">
-                        <h2 className="text-lg font-semibold">Liked: {likedPlaces.length}</h2>
+                    <Box textAlign="center">
+                        <Typography variant="h6" gutterBottom>
+                            Liked: {likedPlaces.length}
+                        </Typography>
                         {likedPlaces.length > 0 ? (
-                            <div>
-                                <TitlebarImageList
-                                    itemData={[...likedPlaces]}
-                                    isLikedTab={true}
-                                    userID={userID}
-                                    onUpdate={handleUpdate}
-                                />
-                            </div>
+                            <TitlebarImageList
+                                itemData={[...likedPlaces]}
+                                isLikedTab={true}
+                                userID={userID}
+                                onUpdate={handleUpdate}
+                            />
                         ) : (
-                            <p>No liked places yet!</p>
+                            <Typography variant="body1">No liked places yet!</Typography>
                         )}
-                    </div>
+                    </Box>
                 )}
                 {value === 1 && (
-                    <div className="text-center">
-                        <h2 className="text-lg font-semibold">Disliked: {dislikedPlaces.length}</h2>
+                    <Box textAlign="center">
+                        <Typography variant="h6" gutterBottom>
+                            Disliked: {dislikedPlaces.length}
+                        </Typography>
                         {dislikedPlaces.length > 0 ? (
-                            <div>
-                                <TitlebarImageList
-                                    itemData={[...dislikedPlaces]}
-                                    isLikedTab={false}
-                                    userID={userID}
-                                    onUpdate={handleUpdate}
-                                />
-                            </div>
+                            <TitlebarImageList
+                                itemData={[...dislikedPlaces]}
+                                isLikedTab={false}
+                                userID={userID}
+                                onUpdate={handleUpdate}
+                            />
                         ) : (
-                            <p>No disliked places yet!</p>
+                            <Typography variant="body1">No disliked places yet!</Typography>
                         )}
-                    </div>
+                    </Box>
                 )}
-            </div>
-        </div>
+            </Box>
+        </Box>
     );
 };
-
 
 export default TabsComponent;

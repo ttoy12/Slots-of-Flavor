@@ -15,12 +15,11 @@ import { useRouter } from 'next/navigation'
 import { signOut } from 'firebase/auth'
 import Cookies from 'js-cookie'
 import Link from 'next/link';
-import PersonIcon from '@mui/icons-material/Person';
-import LogoutIcon from '@mui/icons-material/Logout';
+import Image from 'next/image';
 
 const settings = [
-    { name: 'Profile', icon: <PersonIcon /> },
-    { name: 'Logout', icon: <LogoutIcon /> },
+    { name: 'Profile' },
+    { name: 'Logout' },
 ];
 
 function ResponsiveAppBar() {
@@ -51,30 +50,33 @@ function ResponsiveAppBar() {
     };
 
     return (
-        <AppBar position="static">
-            <Container maxWidth="xl">
+        <AppBar position="static" sx={{ zIndex: 1000 }}>
+            <Container maxWidth="xl" sx={{ padding: 2 }}>
                 <Toolbar disableGutters>
-                    <Link href="/">
-                        <Typography
+                    <Link href="/" className="hover:text-yellow-500">
+                        {/* <Typography
                             variant="h5"
                             noWrap
                             sx={{
                                 mr: 2,
                                 flexGrow: 1,
-                                fontFamily: 'monospace',
+                                fontFamily: 'Segoe UI Emoji',
                                 fontWeight: 700,
-                                letterSpacing: '.3rem',
+                                letterSpacing: '.2rem',
                                 color: 'inherit',
                             }}
                         >
                             Slots of Flavor
-                        </Typography>
+                        </Typography> */}
+                        <Image src="/slots-of-flavor-high-resolution-logo-transparent.png" alt="logo" height={250} width={250}
+                            className="hover:bg-yellow-500"
+                        />
                     </Link>
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar />
+                                <Avatar className="hover:bg-yellow-500" />
                             </IconButton>
                         </Tooltip>
                         <Menu
@@ -104,7 +106,7 @@ function ResponsiveAppBar() {
                                     }}
                                 >
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <Box
+                                        {/* <Box
                                             sx={{
                                                 backgroundColor: 'rgba(0, 0, 0, 0.2)',
                                                 borderRadius: '50%',
@@ -113,7 +115,7 @@ function ResponsiveAppBar() {
                                             }}
                                         >
                                             {setting.icon}
-                                        </Box>
+                                        </Box> */}
                                         <Typography sx={{ textAlign: 'center' }}>{setting.name}</Typography>
                                     </Box>
                                 </MenuItem>
