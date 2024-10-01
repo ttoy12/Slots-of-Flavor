@@ -2,7 +2,7 @@
 import React from 'react';
 import Image from 'next/image';
 import RouteButton from '@/app/components/RouteButton';
-import { Container, Typography, Button, Box } from '@mui/material';
+import { Container, Typography, Box } from '@mui/material';
 
 export default function Welcome() {
     return (
@@ -47,21 +47,9 @@ export default function Welcome() {
                 </Typography>
                 <RouteButton
                     pageName='sign-in'
-                    className="w-full"
+                    className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 hover:bg-blue-800"
                 >
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        sx={{
-                            px: 2,
-                            py: 1.5,
-                            fontWeight: 'bold'
-                        }}
-                        className="transition duration-300 hover:bg-blue-600"
-                    >
-                        Try me!
-                    </Button>
+                    Try me!
                 </RouteButton>
             </Box>
         </Container>
