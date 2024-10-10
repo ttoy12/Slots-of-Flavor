@@ -4,7 +4,7 @@ Slots of Flavor is a Next.js web application that helps users find a random rest
 
 ## Visit live site
 
-Check out the live application at: [(https://slots-of-flavor.vercel.app/)]
+Check out the live application at: https://slots-of-flavor.vercel.app/
 
 ## Features
 
