@@ -17,7 +17,14 @@ export default function Profile() {
                         backgroundColor: '#f7f7f7'
                     }}
                 >
-                    <Typography variant="h4" component="h1" gutterBottom>
+                    <Typography variant="h4" component="h2" gutterBottom align="center"
+                        style={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            fontSize: 'clamp(1rem, 5vw, 2rem)', // Adjust sizes as necessary
+                        }}
+                    >
                         {user.email}
                     </Typography>
                     <TabsComponent userID={user.uid} />

@@ -60,7 +60,14 @@ export default function Home() {
     <AuthWrapper>
       {(user) => (
         <Box sx={{ padding: 3, maxWidth: 600, margin: 'auto', borderRadius: 2, boxShadow: 3, backgroundColor: '#f7f7f7' }}>
-          <Typography variant="h4" component="h2" gutterBottom align="center">
+          <Typography variant="h4" component="h2" gutterBottom align="center"
+            style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              fontSize: 'clamp(1rem, 5vw, 2rem)', // Adjust sizes as necessary
+            }}
+          >
             {user ? `Hi, ${user.email}` : "Hi, Guest"}
           </Typography>
 
