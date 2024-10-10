@@ -4,14 +4,14 @@ Slots of Flavor is a Next.js web application that helps users find a random rest
 
 ## Visit live site
 
-Check out the live application at: [Slots of Flavor](https://slots-of-flavor.vercel.app/)
+Check out the live application at: [(https://slots-of-flavor.vercel.app/)]
 
 ## Features
 
 - Next.js framework for server-side rendering and fast performance
 - User authentication using Firebase
 - Firestore for storing user data
-- Input form for location and price range
+- Input form for location, distance, category, and price range
 - Integrates with the Yelp API to fetch restaurant data
 - Returns a random restaurant from the search results
 
