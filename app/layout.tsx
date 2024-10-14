@@ -17,7 +17,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} h-screen`}>
-        <div className="flex items-center justify-center h-screen" style={{ backgroundColor: '#e0e0e0' }}>
+        <div className="flex items-center justify-center h-screen"
+          style={{
+            backgroundColor: '#e0e0e0',
+            backgroundImage: 'url("/possible_background.jpg")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
           {children}
         </div>
       </body>

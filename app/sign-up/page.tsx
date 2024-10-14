@@ -35,8 +35,8 @@ const SignUp: React.FC = () => {
     };
 
     return (
-        <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#e0e0e0' }}>
-            <Box sx={{ padding: 4, maxWidth: 400, borderRadius: 2, boxShadow: 3, backgroundColor: '#fff' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Box sx={{ padding: 4, maxWidth: 400, borderRadius: 2, boxShadow: 3, backgroundColor: '#f7f7f7' }}>
                 <Image
                     src="/slots-of-flavor-high-resolution-logo-transparent.png"
                     alt="logo"

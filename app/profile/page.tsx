@@ -22,7 +22,7 @@ export default function Profile() {
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
-                            fontSize: 'clamp(1rem, 5vw, 2rem)', // Adjust sizes as necessary
+                            fontSize: 'clamp(1rem, 5vw, 2rem)',
                         }}
                     >
                         {user.email}

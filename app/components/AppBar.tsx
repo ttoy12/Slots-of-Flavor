@@ -50,7 +50,7 @@ function ResponsiveAppBar() {
     };
 
     return (
-        <AppBar position="static" sx={{ zIndex: 1000 }}>
+        <AppBar position="static" sx={{ zIndex: 1000, borderTopLeftRadius: 6, borderTopRightRadius: 6 }}>
             <Container maxWidth="xl" sx={{ padding: 2 }}>
                 <Toolbar disableGutters>
                     <Link href="/" className="hover:text-yellow-500">
