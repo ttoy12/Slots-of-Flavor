@@ -37,7 +37,7 @@ export default function Welcome() {
                     Discover new dining experiences in your area.
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 2 }}>
-                    When you are unsure of what to eat or are looking for something new, we've got you covered!
+                    When you are unsure of what to eat or are looking for something new, we&apos;ve got you covered!
                 </Typography>
                 <Button
                     onClick={handleSignIn}
