@@ -14,34 +14,18 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
 
     return (
         <UserProvider>
-            <Box
-                sx={{
-                    backgroundColor: '#f0f4f8',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    borderRadius: 2,
-                    width: '100%',
-                    height: '100%'
-                }}
-            >
-                <ResponsiveAppBar />
-                <Box
-                    sx={{
-                        flex: 1,
-                        width: '100%',
-                        maxWidth: 600,
-                        padding: 4,
-                    }}
-                >
-                    {user ? (
-                        children(user)
-                    ) : (
-                        <Typography variant="h6" align="center" sx={{ color: '#333' }}>
-                            Please log in to view.
-                        </Typography>
-                    )}
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Box sx={{ width: '100%' }}>
+                    <ResponsiveAppBar />
+                    <Box>
+                        {user ? (
+                            children(user)
+                        ) : (
+                            <Typography variant="h6" align="center" sx={{ color: '#333' }}>
+                                Please log in to view.
+                            </Typography>
+                        )}
+                    </Box>
                 </Box>
             </Box>
         </UserProvider>

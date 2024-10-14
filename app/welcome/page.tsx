@@ -1,57 +1,54 @@
 "use client";
 import React from 'react';
 import Image from 'next/image';
-import RouteButton from '@/app/components/RouteButton';
-import { Container, Typography, Box } from '@mui/material';
+import { Container, Typography, Box, Button } from '@mui/material';
+import { useRouter } from 'next/navigation';
 
 export default function Welcome() {
+    const router = useRouter();
+
+    const handleSignIn = () => {
+        router.push('/sign-in');
+    };
+
     return (
-        <Container
-            maxWidth="sm"
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: '100vh',
-                backgroundColor: '#e0e0e0',
-                padding: 2
-            }}
-        >
-            <Image
-                src="/slots-of-flavor-high-resolution-logo-transparent.png"
-                alt="logo"
-                height={500}
-                width={500}
-                style={{ marginBottom: '20px' }}
-            />
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Box
                 sx={{
-                    mt: 3,
-                    width: '100%',
                     padding: 4,
+                    maxWidth: 400,
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    backgroundColor: '#f7f7f7',
                     textAlign: 'center',
                 }}
             >
-                <Typography variant="h4" component="div" sx={{ fontWeight: 'bold' }}>
+                <Image
+                    src="/slots-of-flavor-high-resolution-logo-transparent.png"
+                    alt="logo"
+                    height={500}
+                    width={500}
+                    style={{ marginBottom: '20px' }}
+                />
+                <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', mb: 2 }}>
                     Welcome!
                 </Typography>
                 <Typography sx={{ mb: 1.5 }} color="text.secondary">
                     Discover new dining experiences in your area.
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 2 }}>
-                    When you are unsure of what to eat or are looking for something new.
+                    When you are unsure of what to eat or are looking for something new, we&apos;ve got you covered!
                 </Typography>
-                <Typography variant="body1" sx={{ mb: 2 }}>
-                    We&apos;ve got you covered!
-                </Typography>
-                <RouteButton
-                    pageName='sign-in'
-                    className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 hover:bg-blue-800"
+                <Button
+                    onClick={handleSignIn}
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    sx={{ marginTop: 2 }}
                 >
                     Try me!
-                </RouteButton>
+                </Button>
             </Box>
-        </Container>
+        </Box>
     );
 }

@@ -59,13 +59,22 @@ export default function Home() {
   return (
     <AuthWrapper>
       {(user) => (
-        <Box sx={{ padding: 3, maxWidth: 600, margin: 'auto', borderRadius: 2, boxShadow: 3, backgroundColor: '#f7f7f7' }}>
+        <Box
+          sx={{
+            padding: 4,
+            maxWidth: 600,
+            margin: 'auto',
+            borderBottomLeftRadius: 6,
+            borderBottomRightRadius: 6,
+            backgroundColor: '#f7f7f7',
+          }}
+        >
           <Typography variant="h4" component="h2" gutterBottom align="center"
             style={{
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
-              fontSize: 'clamp(1rem, 5vw, 2rem)', // Adjust sizes as necessary
+              fontSize: 'clamp(1rem, 5vw, 2rem)',
             }}
           >
             {user ? `Hi, ${user.email}` : "Hi, Guest"}
@@ -80,6 +89,7 @@ export default function Home() {
               onChange={(e) => setLocation(e.target.value)}
               required
               margin="normal"
+              aria-required
             />
 
             <FormControl fullWidth margin="normal">

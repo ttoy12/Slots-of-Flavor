@@ -9,14 +9,6 @@ Both solutions will allow you to focus more on building features and less on man
 
 yelp developer: https://www.yelp.com/developers/v3/manage_app
 
-new name: Slots of Flavor?
-
-9/22/2024:
-Got yelp API working.
-To do:
-need to configure api a bit for other options.
-randomize option after
-create a way to mark places as visited, and favorites
-figure out how to format page and do styling
-
-check this out for spacing on flex items: https://tailwindcss.com/docs/flex-basis
+10/11/2024:
+https://postalpro.usps.com/ZIP_Locale_Detail
+maybe download this and incorporate to autocomplete location???

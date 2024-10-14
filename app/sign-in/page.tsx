@@ -97,7 +97,7 @@ const SignIn: React.FC = () => {
     // }, [router]);
 
     return (
-        <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Box sx={{ padding: 4, maxWidth: 400, borderRadius: 2, boxShadow: 3, backgroundColor: '#f7f7f7' }}>
                 <Image
                     src="/slots-of-flavor-high-resolution-logo-transparent.png"
