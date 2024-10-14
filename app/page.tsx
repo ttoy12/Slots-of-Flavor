@@ -61,12 +61,11 @@ export default function Home() {
       {(user) => (
         <Box
           sx={{
-            padding: 3,
+            padding: 4,
             maxWidth: 600,
             margin: 'auto',
             borderBottomLeftRadius: 6,
             borderBottomRightRadius: 6,
-            boxShadow: 3,
             backgroundColor: '#f7f7f7',
           }}
         >

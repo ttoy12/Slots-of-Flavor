@@ -12,9 +12,9 @@ export default function Profile() {
                         padding: 4,
                         maxWidth: 600,
                         margin: 'auto',
-                        borderRadius: 2,
-                        boxShadow: 3,
-                        backgroundColor: '#f7f7f7'
+                        borderBottomLeftRadius: 6,
+                        borderBottomRightRadius: 6,
+                        backgroundColor: '#f7f7f7',
                     }}
                 >
                     <Typography variant="h4" component="h2" gutterBottom align="center"

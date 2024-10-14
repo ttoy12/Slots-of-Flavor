@@ -50,24 +50,17 @@ function ResponsiveAppBar() {
     };
 
     return (
-        <AppBar position="static" sx={{ zIndex: 1000, borderTopLeftRadius: 6, borderTopRightRadius: 6 }}>
+        <AppBar position="static"
+            sx={{
+                backgroundColor: '#f7f7f7',
+                zIndex: 1000,
+                borderTopLeftRadius: 6,
+                borderTopRightRadius: 6,
+                borderBottom: '2px solid #ccc'
+            }}>
             <Container maxWidth="xl" sx={{ padding: 2 }}>
                 <Toolbar disableGutters>
                     <Link href="/" className="hover:text-yellow-500">
-                        {/* <Typography
-                            variant="h5"
-                            noWrap
-                            sx={{
-                                mr: 2,
-                                flexGrow: 1,
-                                fontFamily: 'Segoe UI Emoji',
-                                fontWeight: 700,
-                                letterSpacing: '.2rem',
-                                color: 'inherit',
-                            }}
-                        >
-                            Slots of Flavor
-                        </Typography> */}
                         <Image src="/slots-of-flavor-high-resolution-logo-transparent.png" alt="logo" height={250} width={250}
                             className="hover:bg-yellow-500"
                         />
@@ -106,16 +99,6 @@ function ResponsiveAppBar() {
                                     }}
                                 >
                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {/* <Box
-                                            sx={{
-                                                backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                                                borderRadius: '50%',
-                                                padding: '4px',
-                                                marginRight: '4px',
-                                            }}
-                                        >
-                                            {setting.icon}
-                                        </Box> */}
                                         <Typography sx={{ textAlign: 'center' }}>{setting.name}</Typography>
                                     </Box>
                                 </MenuItem>
