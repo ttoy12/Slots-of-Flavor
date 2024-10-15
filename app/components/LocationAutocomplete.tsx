@@ -37,7 +37,6 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({ location, s
         const filteredSuggestions = cities
             .filter(city => {
                 const cityName = city.City || "";
-                const state = city.State || "";
 
                 return cityName.toLowerCase().includes(input.toLowerCase());
             })
@@ -51,11 +50,11 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({ location, s
         <Autocomplete
             freeSolo
             options={suggestions}
-            onInputChange={(event, newInputValue) => {
+            onInputChange={(_, newInputValue) => {
                 setLocation(newInputValue);
                 fetchSuggestions(newInputValue);
             }}
-            onChange={(event, newValue) => {
+            onChange={(_, newValue) => {
                 setLocation(newValue || "");
                 setSuggestions([]);
             }}
