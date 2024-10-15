@@ -7,6 +7,7 @@ import AuthWrapper from './components/AuthWrapper';
 import useFetchLikedAndDislikedPlaces from './hooks/useFetchLikedAndDislikedPlaces';
 import { Business } from './firebase/firestore';
 import { useUser } from './components/UserContext';
+import LocationAutocomplete from './components/LocationAutocomplete';
 
 export default function Home() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
@@ -81,7 +82,8 @@ export default function Home() {
           </Typography>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <TextField
+            <LocationAutocomplete location={location} setLocation={setLocation} />
+            {/* <TextField
               fullWidth
               variant="outlined"
               placeholder="Enter a location (City or Zipcode)"
@@ -90,7 +92,7 @@ export default function Home() {
               required
               margin="normal"
               aria-required
-            />
+            /> */}
 
             <FormControl fullWidth margin="normal">
               <InputLabel id="distance-label">Select Distance</InputLabel>
