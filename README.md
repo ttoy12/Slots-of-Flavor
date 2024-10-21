@@ -1,6 +1,10 @@
 # Slots of Flavor
 
-Slots of Flavor is a Next.js web application that helps users find a random restaurant based on their preferences, such as location and price range. Using the Yelp API, it retrieves 50 restaurant results and selects one at random to suggest. The app also features user authentication via Firebase and stores user data in Firestore.
+Slots of Flavor is a Next.js web application that helps users find a random restaurant based on their preferences, such as location and price range. Using the Yelp Business Search API, it retrieves 50 restaurant results and selects one at random to suggest. The app also features user authentication via Firebase and stores user data in Firestore.
+
+## Updates
+
+- Looking to switch API's or find another solution to restaurant pulling soon.
 
 ## Visit live site
 
