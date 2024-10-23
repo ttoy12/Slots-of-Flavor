@@ -33,7 +33,8 @@ const SignIn: React.FC = () => {
                 Cookies.set('user', JSON.stringify({ email: email }), { expires: 7 }); // Expires in 7 days
                 setEmail('');
                 setPassword('');
-                router.push('/');
+                // router.push('/');
+                router.push('/down-page')
             }
         } catch (e) {
             console.error(e);
@@ -61,7 +62,8 @@ const SignIn: React.FC = () => {
 
                 // set user cookies and redirect
                 Cookies.set('user', JSON.stringify({ email: res.user.email }), { expires: 7 });
-                router.push('/');
+                // router.push('/');
+                router.push('/down-page');
             }
 
         } catch (error) {
