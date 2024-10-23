@@ -83,16 +83,6 @@ export default function Home() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <LocationAutocomplete location={location} setLocation={setLocation} />
-            {/* <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Enter a location (City or Zipcode)"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              required
-              margin="normal"
-              aria-required
-            /> */}
 
             <FormControl fullWidth margin="normal">
               <InputLabel id="distance-label">Select Distance</InputLabel>

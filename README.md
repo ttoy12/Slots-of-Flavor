@@ -4,13 +4,17 @@ Slots of Flavor is a Next.js web application that helps users find a random rest
 
 ## Updates
 
-- Looking to switch API's or find another solution to restaurant pulling soon.
+- Site currently down. Looking for new API as free access to Yelp API ending soon.
 
 ## Visit live site
 
 Check out the live application at: https://slots-of-flavor.vercel.app/
 
 ![Slots of Flavor Welcome](https://i.imgur.com/JuBSZvN.jpeg)
+
+## YouTube Demo
+
+Check out a short demo of the applicaiton on YouTube: [Slots of Flavor Demo](https://www.youtube.com/watch?v=iQstPxtEtl0)
 
 ## Features
 
