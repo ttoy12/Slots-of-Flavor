@@ -38,11 +38,26 @@ const DownPage: React.FC = () => {
                         For updates, check our Updates section in our GitHub repository:
                     </Typography>
                     <a href="https://github.com/ttoy12/Slots-of-Flavor/tree/main" target="_blank" rel="noopener noreferrer"
-                        className="hover:text-blue-700 hover:underline"
+                        className="text-blue-500 font-bold hover:underline"
                     >
                         View GitHub Repo
                     </a>
                 </Box>
+
+                <Box sx={{ marginTop: 3 }}>
+                    <Typography variant="body2" gutterBottom>
+                        Want to see a demo? Check out the video below:
+                    </Typography>
+                    <a
+                        href="https://www.youtube.com/watch?v=iQstPxtEtl0"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 font-bold hover:underline"
+                    >
+                        View Demo on YouTube
+                    </a>
+                </Box>
+
             </Box>
         </Box >
     );
