@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
-import { Logo } from './SiteHeader';
+import { Logo } from './Brand';
 import { Card, Input } from './ui';
 import SiteFooter from './SiteFooter';
 
@@ -16,7 +16,7 @@ export function AuthShell({ title, subtitle, children, footer }: {
     return (
         <div className="flex min-h-screen flex-col items-center justify-center px-4 py-10">
             <Link href="/welcome" className="mb-8">
-                <Logo className="w-56" />
+                <Logo size="lg" />
             </Link>
             <Card className="w-full max-w-md p-6 sm:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <h1 className="text-3xl font-bold">{title}</h1>

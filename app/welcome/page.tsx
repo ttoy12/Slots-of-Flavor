@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight, Dices, MapPin, ThumbsUp } from 'lucide-react';
-import { Logo } from '../components/SiteHeader';
+import { Logo } from '../components/Brand';
 import { buttonClasses } from '../components/ui';
 import SiteFooter from '../components/SiteFooter';
 
@@ -15,7 +15,7 @@ export default async function Welcome({ searchParams }: { searchParams: Promise<
     return (
         <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-4">
             <header className="flex items-center justify-between py-5">
-                <Logo className="w-36 sm:w-44" />
+                <Logo size="md" />
                 <Link href="/sign-in" className={buttonClasses('glass', 'sm')}>Sign in</Link>
             </header>
 
