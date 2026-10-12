@@ -6,11 +6,11 @@ type ButtonVariant = "primary" | "secondary" | "ghost" | "outline" | "glass";
 type ButtonSize = "sm" | "md" | "lg";
 
 const buttonVariants: Record<ButtonVariant, string> = {
-    primary: "bg-primary text-primary-foreground shadow-sm shadow-primary/30 hover:bg-primary/90",
+    primary: "bg-primary text-primary-foreground shadow-xs shadow-primary/30 hover:bg-primary/90",
     secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/70",
     ghost: "text-foreground hover:bg-secondary",
     outline: "border border-input bg-white text-foreground hover:bg-secondary/60",
-    glass: "border border-white/25 bg-white/10 text-white backdrop-blur hover:bg-white/20",
+    glass: "border border-white/25 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20",
 };
 
 const buttonSizes: Record<ButtonSize, string> = {
@@ -22,7 +22,7 @@ const buttonSizes: Record<ButtonSize, string> = {
 export const buttonClasses = (variant: ButtonVariant = "primary", size: ButtonSize = "md", className?: string) =>
     cn(
         "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         "disabled:pointer-events-none disabled:opacity-60",
         buttonVariants[variant],
         buttonSizes[size],
@@ -45,9 +45,9 @@ export function Button({ variant, size, loading, className, children, disabled, 
 }
 
 export const inputClasses = cn(
-    "h-11 w-full rounded-xl border border-input bg-white px-3.5 text-sm text-foreground shadow-sm",
+    "h-11 w-full rounded-xl border border-input bg-white px-3.5 text-sm text-foreground shadow-xs",
     "placeholder:text-muted-foreground/70 transition-colors",
-    "focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+    "focus:border-primary focus:outline-hidden focus:ring-2 focus:ring-primary/20"
 );
 
 export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
@@ -80,7 +80,7 @@ export function Chip({ selected, className, ...props }: React.ButtonHTMLAttribut
             aria-pressed={selected}
             className={cn(
                 "inline-flex h-9 items-center justify-center rounded-full border px-3.5 text-sm font-medium transition-colors",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
+                "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
                 selected
                     ? "border-foreground bg-foreground text-white"
                     : "border-input bg-white text-foreground hover:border-foreground/40",

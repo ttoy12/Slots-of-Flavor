@@ -221,7 +221,7 @@ export default function Home() {
                         type="button"
                         aria-pressed={distance === value}
                         onClick={() => setDistance(value)}
-                        className={`h-8 rounded-full text-xs font-semibold transition-colors ${distance === value ? 'bg-white text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                        className={`h-8 rounded-full text-xs font-semibold transition-colors ${distance === value ? 'bg-white text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
                       >
                         {label}
                       </button>
@@ -274,7 +274,7 @@ export default function Home() {
               )}
             >
               {showSheet && (
-                <div className="sticky top-0 z-10 flex items-center justify-between bg-background/80 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur">
+                <div className="sticky top-0 z-10 flex items-center justify-between bg-background/80 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur-sm">
                   <span className="font-display text-lg font-bold text-white">Your spin</span>
                   <button
                     ref={closeRef}
@@ -300,7 +300,7 @@ export default function Home() {
                 />
               </div>
               {showSheet && (
-                <div className="sticky bottom-0 grid grid-cols-2 gap-2 bg-background/90 px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur">
+                <div className="sticky bottom-0 grid grid-cols-2 gap-2 bg-background/90 px-3 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-sm">
                   <Button variant="glass" size="lg" onClick={() => setSheetOpen(false)}>
                     <SlidersHorizontal className="h-4 w-4" aria-hidden /> Edit search
                   </Button>

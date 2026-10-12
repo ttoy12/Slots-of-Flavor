@@ -20,13 +20,13 @@ export default async function Welcome({ searchParams }: { searchParams: Promise<
             </header>
 
             {deleted && (
-                <p role="status" className="mt-4 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white backdrop-blur">
+                <p role="status" className="mt-4 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white backdrop-blur-sm">
                     Your account and everything saved with it have been deleted. Thanks for spinning with us.
                 </p>
             )}
 
             <section className="flex flex-1 flex-col justify-center py-16 text-white">
-                <p className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm backdrop-blur">
+                <p className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm backdrop-blur-sm">
                     <span className="h-2 w-2 rounded-full bg-accent" /> Only shows places open right now
                 </p>
                 <h1 className="max-w-3xl text-5xl font-extrabold leading-[1.05] sm:text-7xl text-balance">

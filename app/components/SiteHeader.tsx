@@ -21,7 +21,7 @@ export function Logo({ className }: { className?: string }) {
             alt="Slots of Flavor"
             width={2000}
             height={590}
-            className={cn("h-auto [filter:invert(1)_brightness(1.6)]", className)}
+            className={cn("h-auto filter-[invert(1)_brightness(1.6)]", className)}
             loading="eager"
         />
     );
@@ -60,19 +60,19 @@ export default function SiteHeader({ email }: { email?: string | null }) {
 
     return (
         <header className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-5">
-            <Link href="/" className="shrink-0 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">
-                <Logo className="w-36 sm:w-44" />
+            <Link href="/" className="shrink-0 rounded-md focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-white/70">
+                <Logo className="w-28 sm:w-44" />
             </Link>
 
-            <div className="flex items-center gap-2 sm:gap-3">
-                <nav className="flex rounded-full border border-white/15 bg-white/10 p-1 backdrop-blur">
+            <div className="flex items-center gap-1.5 sm:gap-3">
+                <nav className="flex rounded-full border border-white/15 bg-white/10 p-1 backdrop-blur-sm">
                     {NAV.map(({ href, label }) => (
                         <Link
                             key={href}
                             href={href}
                             aria-current={pathname === href ? "page" : undefined}
                             className={cn(
-                                "rounded-full px-4 py-1.5 text-sm font-semibold transition-colors",
+                                "whitespace-nowrap rounded-full px-2.5 py-1.5 text-sm font-semibold transition-colors sm:px-4",
                                 pathname === href ? "bg-white text-foreground" : "text-white/80 hover:text-white"
                             )}
                         >
@@ -87,7 +87,7 @@ export default function SiteHeader({ email }: { email?: string | null }) {
                         aria-haspopup="menu"
                         aria-expanded={menuOpen}
                         aria-label="Account menu"
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-accent font-display text-base font-bold uppercase text-accent-foreground ring-2 ring-white/30 transition hover:ring-white/60 focus-visible:outline-none focus-visible:ring-white"
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-accent font-display text-base font-bold uppercase text-accent-foreground ring-2 ring-white/30 transition hover:ring-white/60 focus-visible:outline-hidden focus-visible:ring-white"
                     >
                         {email?.[0] ?? "?"}
                     </button>
