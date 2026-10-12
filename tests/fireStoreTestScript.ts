@@ -1,13 +1,6 @@
-import { addUser, addLikedPlace, addDislikedPlace, removedLikedPlace, removedDislikedPlace } from '../app/firebase/firestore';
+import { addUser, addLikedPlace, addDislikedPlace, removedLikedPlace, removedDislikedPlace, Business } from '../app/firebase/firestore';
 // import { db } from '../app/firebase/firebaseConfig';
 // import { DocumentData } from 'firebase/firestore'; // Import the type for Firestore documents
-
-// Define the shape of your business object
-interface Business {
-    id: string;
-    name: string;
-    price: string;
-}
 
 // Sample user and business data
 const testUserID: string = 'testUser123';
@@ -15,7 +8,9 @@ const testEmail: string = 'testuser@example.com';
 const testBusiness: Business = {
     id: 'business1',
     name: 'Test Business',
-    price: '$10',
+    url: 'https://www.google.com/maps/place/?q=place_id:business1',
+    image_url: null,
+    price: '$$',
 };
 
 // Function to run tests

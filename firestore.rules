@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each user can only read and write their own user doc and its
+    // liked/disliked subcollections ({document=**} also matches the user doc).
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Shared daily search counter, one doc per day (usage/YYYY-MM-DD).
+    // It can only go up one at a time and never past 30, so nobody can reset
+    // it from the browser. Keep 30 in sync with DAILY_SEARCH_LIMIT in
+    // lib/searchLimit.ts.
+    match /usage/{day} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['count'])
+        && request.resource.data.count == 1;
+      allow update: if request.auth != null
+        && request.resource.data.keys().hasOnly(['count'])
+        && request.resource.data.count == resource.data.count + 1
+        && request.resource.data.count <= 30;
+    }
+  }
+}
