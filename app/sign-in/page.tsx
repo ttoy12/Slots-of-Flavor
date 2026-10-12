@@ -1,194 +1,116 @@
 "use client"
 
 import { useState } from 'react';
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
-import { auth } from '@/app/firebase/firebaseConfig';
-import { useRouter } from 'next/navigation';
-import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, signInWithPopup, sendPasswordResetEmail } from 'firebase/auth';
-import Image from 'next/image';
 import Link from 'next/link';
-import Cookies from 'js-cookie';
-import { getDoc, doc } from 'firebase/firestore';
-import { addUser } from '../firebase/firestore';
-import { db } from '@/app/firebase/firebaseConfig';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Button, TextField, Typography, Box, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-
+import { useRouter } from 'next/navigation';
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/app/firebase/firebaseConfig';
+import { setSessionCookie, signInWithGoogle } from '@/app/firebase/auth';
+import { AuthShell, Divider, GoogleMark, PasswordInput } from '../components/AuthShell';
+import { Alert, Button, Field, Input } from '../components/ui';
+import { authErrorMessage } from '@/lib/authErrors';
 
 const SignIn: React.FC = () => {
+    const router = useRouter();
+    const [mode, setMode] = useState<'sign-in' | 'reset'>('sign-in');
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [signInWithEmailAndPassword, userCred, loading, error] = useSignInWithEmailAndPassword(auth);
-    const router = useRouter();
-    const [showResetModal, setShowResetModal] = useState<boolean>(false);
-    const [resetEmail, setResetEmail] = useState<string>('');
-    const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [pending, setPending] = useState<'email' | 'google' | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [notice, setNotice] = useState<string | null>(null);
 
-    const handleSignIn = async () => {
+    const run = async (kind: 'email' | 'google', action: () => Promise<void>) => {
+        setPending(kind);
+        setError(null);
+        setNotice(null);
         try {
-            const res = await signInWithEmailAndPassword(email, password);
-            if (res?.user) {
-                // console.log(res?.user?.email);
-                Cookies.set('user', JSON.stringify({ email: email }), { expires: 7 }); // Expires in 7 days
-                setEmail('');
-                setPassword('');
-                // router.push('/');
-                router.push('/down-page')
-            }
+            await action();
         } catch (e) {
             console.error(e);
+            setError(authErrorMessage(e));
+        } finally {
+            setPending(null);
         }
     };
 
-    const handleGoogleSignIn = async () => {
-        try {
-            // https://www.reddit.com/r/Firebase/comments/1doskev/signinwithredirect_is_not_signing_in_but/ 
-            // sign in with redirect not working on local
-            // const res = await signInWithRedirect(auth, new GoogleAuthProvider());
-            // console.log({ res });
-            const res = await signInWithPopup(auth, new GoogleAuthProvider());
-            if (res?.user) {
-                const email = res.user.email;
-                if (email) {
-                    const userDocRef = doc(db, 'users', res.user.uid);
-                    const userDoc = await getDoc(userDocRef);
-
-                    // if user does not exist, add them
-                    if (!userDoc.exists()) {
-                        await addUser(res.user.uid, email);
-                    }
-                }
-
-                // set user cookies and redirect
-                Cookies.set('user', JSON.stringify({ email: res.user.email }), { expires: 7 });
-                // router.push('/');
-                router.push('/down-page');
-            }
-
-        } catch (error) {
-            console.error("Error initiating Google sign-in: ", error);
-        }
+    const handleSignIn = (e: React.FormEvent) => {
+        e.preventDefault();
+        run('email', async () => {
+            const { user } = await signInWithEmailAndPassword(auth, email, password);
+            setSessionCookie(user);
+            router.push('/');
+        });
     };
 
+    const handleGoogleSignIn = () => run('google', async () => {
+        await signInWithGoogle();
+        router.push('/');
+    });
 
-    const handleResetPassword = async () => {
-        try {
-            await sendPasswordResetEmail(auth, resetEmail);
-            alert('Check your email for password reset!');
-            setShowResetModal(false);
-            setResetEmail('');
-        } catch (error) {
-            console.error("Error sending password reset email: ", error);
-            alert('Failed to send reset email. Please check if you put a valid email address.')
-        }
+    const handleResetPassword = (e: React.FormEvent) => {
+        e.preventDefault();
+        run('email', async () => {
+            await sendPasswordResetEmail(auth, email);
+            setNotice(`If ${email} has an account, a reset link is on its way.`);
+        });
+    };
+
+    const switchMode = (next: 'sign-in' | 'reset') => {
+        setMode(next);
+        setError(null);
+        setNotice(null);
+    };
+
+    if (mode === 'reset') {
+        return (
+            <AuthShell
+                title="Reset password"
+                subtitle="We'll email you a link to choose a new one."
+                footer={<button onClick={() => switchMode('sign-in')} className="font-semibold text-white hover:underline">Back to sign in</button>}
+            >
+                <form onSubmit={handleResetPassword} className="space-y-4">
+                    <Field label="Email" htmlFor="reset-email">
+                        <Input id="reset-email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                    </Field>
+                    {error && <Alert>{error}</Alert>}
+                    {notice && <Alert tone="success">{notice}</Alert>}
+                    <Button type="submit" className="w-full" loading={pending === 'email'}>Send reset link</Button>
+                </form>
+            </AuthShell>
+        );
     }
 
-    ////////////////// USE redirect when on production??
-    // useEffect(() => {
-    //     const fetchRedirectResult = async () => {
-    //         const result = await getRedirectResult(auth);
-    //         console.log(result);
-    //         if (result?.user) {
-    //             Cookies.set('user', JSON.stringify({ email: result.user.email }), { expires: 7 });
-    //             router.push('/');
-    //         }
-    //     };
-
-    //     fetchRedirectResult();
-    // }, [router]);
-
     return (
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Box sx={{ padding: 4, maxWidth: 400, borderRadius: 2, boxShadow: 3, backgroundColor: '#f7f7f7' }}>
-                <Image
-                    src="/slots-of-flavor-high-resolution-logo-transparent.png"
-                    alt="logo"
-                    height={500}
-                    width={500}
-                    style={{ marginBottom: '20px' }}
-                />
+        <AuthShell
+            title="Welcome back"
+            subtitle="Sign in to keep spinning."
+            footer={<>New here? <Link href="/sign-up" className="font-semibold text-white hover:underline">Create an account</Link></>}
+        >
+            <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} loading={pending === 'google'} disabled={pending !== null}>
+                {pending !== 'google' && <GoogleMark />}
+                Continue with Google
+            </Button>
 
-                <TextField
-                    fullWidth
-                    variant="outlined"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    margin="normal"
-                />
-                <TextField
-                    fullWidth
-                    variant="outlined"
-                    placeholder="Password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    margin="normal"
-                    InputProps={{
-                        endAdornment: (
-                            <IconButton onClick={() => setShowPassword(!showPassword)}>
-                                {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                            </IconButton>
-                        ),
-                    }}
-                />
-                <Button
-                    onClick={handleSignIn}
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    sx={{ marginTop: 2 }}
-                    disabled={loading}
-                >
-                    Sign In
-                </Button>
-                <Button
-                    onClick={handleGoogleSignIn}
-                    variant="outlined"
-                    fullWidth
-                    sx={{ marginTop: 2 }}
-                >
-                    <Image
-                        src="/google-icon.png"
-                        alt="Google Logo"
-                        width={20}
-                        height={20}
-                        className="mr-2"
-                    />
-                    Sign in with Google
-                </Button>
-                {error && <Typography color="error" variant="body2" align="center" sx={{ marginTop: 2 }}>{error.message}</Typography>}
-                <Typography variant="body2" align="center" sx={{ marginTop: 2 }}>
-                    Don&apos;t have an account? <Link href="/sign-up" className="hover:text-blue-500 hover:underline">Click here to sign up</Link>
-                </Typography>
-                <Typography variant="body2" align="center" sx={{ marginTop: 2, cursor: 'pointer' }}
-                    className="hover:text-blue-500 hover:underline"
-                    onClick={() => setShowResetModal(true)}>
-                    Forgot password?
-                </Typography>
-            </Box>
+            <Divider label="or" />
 
-            <Dialog open={showResetModal} onClose={() => setShowResetModal(false)}>
-                <DialogTitle>Reset Password</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        fullWidth
-                        placeholder="Enter your email"
-                        value={resetEmail}
-                        onChange={(e) => setResetEmail(e.target.value)}
-                        variant="outlined"
-                        margin="normal"
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleResetPassword} color="primary">Send Reset Email</Button>
-                    <Button onClick={() => setShowResetModal(false)}>Cancel</Button>
-                </DialogActions>
-            </Dialog>
-        </Box>
+            <form onSubmit={handleSignIn} className="space-y-4">
+                <Field label="Email" htmlFor="email">
+                    <Input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                </Field>
+                <div className="space-y-1.5">
+                    <div className="flex items-baseline justify-between">
+                        <label htmlFor="password" className="text-sm font-semibold">Password</label>
+                        <button type="button" onClick={() => switchMode('reset')} className="text-xs font-medium text-primary hover:underline">
+                            Forgot password?
+                        </button>
+                    </div>
+                    <PasswordInput id="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                </div>
+                {error && <Alert>{error}</Alert>}
+                <Button type="submit" className="w-full" loading={pending === 'email'} disabled={pending !== null}>Sign in</Button>
+            </form>
+        </AuthShell>
     );
 };
-
 
 export default SignIn;

@@ -1,89 +1,75 @@
 "use client"
 
 import { useState } from 'react';
-import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
-import { auth } from '@/app/firebase/firebaseConfig';
 import Link from 'next/link';
-import Cookies from 'js-cookie';
-import { addUser } from '../firebase/firestore';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Button, TextField, Typography, Box, IconButton } from '@mui/material';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/app/firebase/firebaseConfig';
+import { addUser } from '../firebase/firestore';
+import { setSessionCookie, signInWithGoogle } from '@/app/firebase/auth';
+import { AuthShell, Divider, GoogleMark, PasswordInput } from '../components/AuthShell';
+import { Alert, Button, Field, Input } from '../components/ui';
+import { authErrorMessage } from '@/lib/authErrors';
 
 const SignUp: React.FC = () => {
+    const router = useRouter();
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [createUserWithEmailAndPassword, userCred, loading, error] = useCreateUserWithEmailAndPassword(auth);
-    const router = useRouter();
-    const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [pending, setPending] = useState<'email' | 'google' | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleSignUp = async () => {
+    const run = async (kind: 'email' | 'google', action: () => Promise<void>) => {
+        setPending(kind);
+        setError(null);
         try {
-            const res = await createUserWithEmailAndPassword(email, password);
-            if (res?.user) {
-                await addUser(res.user.uid, email);
-                Cookies.set('user', JSON.stringify({ email }), { expires: 7 });
-                setEmail('');
-                setPassword('');
-                router.push('/sign-in');
-            }
+            await action();
+            router.push('/');
         } catch (e) {
             console.error(e);
+            setError(authErrorMessage(e));
+        } finally {
+            setPending(null);
         }
     };
 
+    const handleSignUp = (e: React.FormEvent) => {
+        e.preventDefault();
+        run('email', async () => {
+            const { user } = await createUserWithEmailAndPassword(auth, email, password);
+            await addUser(user.uid, email);
+            setSessionCookie(user);
+        });
+    };
+
     return (
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Box sx={{ padding: 4, maxWidth: 400, borderRadius: 2, boxShadow: 3, backgroundColor: '#f7f7f7' }}>
-                <Image
-                    src="/slots-of-flavor-high-resolution-logo-transparent.png"
-                    alt="logo"
-                    height={500}
-                    width={500}
-                    style={{ marginBottom: '20px' }}
-                />
-                <TextField
-                    fullWidth
-                    variant="outlined"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    margin="normal"
-                />
-                <TextField
-                    fullWidth
-                    variant="outlined"
-                    placeholder="Password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    margin="normal"
-                    InputProps={{
-                        endAdornment: (
-                            <IconButton onClick={() => setShowPassword(!showPassword)}>
-                                {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                            </IconButton>
-                        ),
-                    }}
-                />
-                <Button
-                    onClick={handleSignUp}
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    sx={{ marginTop: 2 }}
-                    disabled={loading}
-                >
-                    Sign Up
-                </Button>
-                {error && <Typography color="error" variant="body2" align="center" sx={{ marginTop: 2 }}>{error.message}</Typography>}
-                <Typography variant="body2" align="center" sx={{ marginTop: 2 }}>
-                    Already have an account? <Link href="/sign-in" className="hover:text-blue-500 hover:underline">Click here to log in</Link>
-                </Typography>
-            </Box>
-        </Box>
+        <AuthShell
+            title="Create your account"
+            subtitle="Keep the spots you like and never see the ones you don't."
+            footer={<>Already have an account? <Link href="/sign-in" className="font-semibold text-white hover:underline">Sign in</Link></>}
+        >
+            <Button variant="outline" className="w-full" onClick={() => run('google', async () => { await signInWithGoogle(); })} loading={pending === 'google'} disabled={pending !== null}>
+                {pending !== 'google' && <GoogleMark />}
+                Sign up with Google
+            </Button>
+
+            <Divider label="or" />
+
+            <form onSubmit={handleSignUp} className="space-y-4">
+                <Field label="Email" htmlFor="email">
+                    <Input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                </Field>
+                <Field label="Password" htmlFor="password" hint="At least 6 characters.">
+                    <PasswordInput id="password" autoComplete="new-password" minLength={6} required value={password} onChange={(e) => setPassword(e.target.value)} />
+                </Field>
+                {error && <Alert>{error}</Alert>}
+                <Button type="submit" className="w-full" loading={pending === 'email'} disabled={pending !== null}>Create account</Button>
+            </form>
+            <p className="mt-4 text-center text-xs text-muted-foreground">
+                By creating an account, you agree to our{' '}
+                <Link href="/terms" className="font-medium text-foreground underline underline-offset-2">Terms of Service</Link> and{' '}
+                <Link href="/privacy" className="font-medium text-foreground underline underline-offset-2">Privacy Policy</Link>.
+            </p>
+        </AuthShell>
     );
 };
 

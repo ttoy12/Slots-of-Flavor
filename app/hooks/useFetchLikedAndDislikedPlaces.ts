@@ -1,37 +1,35 @@
 import { useEffect, useState } from 'react';
-import { getLikedPlaces, getDislikedPlaces } from '../firebase/firestore';
+import { getLikedPlaces, getDislikedPlaces, Business } from '../firebase/firestore';
 
 const useFetchLikedAndDislikedPlaces = (userID?: string | null) => {
-    const [likedPlaces, setLikedPlaces] = useState<any[]>([]);
-    const [dislikedPlaces, setDislikedPlaces] = useState<any[]>([]);
+    const [likedPlaces, setLikedPlaces] = useState<Business[]>([]);
+    const [dislikedPlaces, setDislikedPlaces] = useState<Business[]>([]);
+    const [loadedFor, setLoadedFor] = useState<string | null>(null);
     const [shouldUpdate, setShouldUpdate] = useState<boolean>(false);
 
     useEffect(() => {
-        if (!userID) {
-            setLikedPlaces([]);
-            setDislikedPlaces([]);
-            return;
-        }
+        if (!userID) return;
 
-        const fetchLikedPlaces = async () => {
-            const liked = await getLikedPlaces(userID);
-            setLikedPlaces(liked);
+        // Sequential so the one-time legacy migration runs before the second read.
+        const fetchPlaces = async () => {
+            setLikedPlaces(await getLikedPlaces(userID));
+            setDislikedPlaces(await getDislikedPlaces(userID));
+            setLoadedFor(userID);
         };
 
-        const fetchDislikedPlaces = async () => {
-            const disliked = await getDislikedPlaces(userID);
-            setDislikedPlaces(disliked);
-        };
-
-        fetchLikedPlaces();
-        fetchDislikedPlaces();
+        fetchPlaces();
     }, [userID, shouldUpdate]);
 
     const handleUpdate = () => {
         setShouldUpdate(prev => !prev);
     };
 
-    return { likedPlaces, dislikedPlaces, handleUpdate };
+    return {
+        likedPlaces: userID ? likedPlaces : [],
+        dislikedPlaces: userID ? dislikedPlaces : [],
+        loading: !!userID && loadedFor !== userID,
+        handleUpdate,
+    };
 };
 
 export default useFetchLikedAndDislikedPlaces;

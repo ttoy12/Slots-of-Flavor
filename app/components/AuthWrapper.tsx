@@ -1,34 +1,37 @@
+"use client";
 import React from 'react';
+import Link from 'next/link';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import type { User } from 'firebase/auth';
 import { auth } from '../firebase/firebaseConfig';
-import ResponsiveAppBar from './AppBar';
-import { UserProvider } from './UserContext';
-import { Box, Typography } from '@mui/material';
+import SiteHeader from './SiteHeader';
+import { buttonClasses, Spinner } from './ui';
+import SiteFooter from './SiteFooter';
 
 interface AuthWrapperProps {
-    children: (user: any) => React.ReactNode;
+    children: (user: User) => React.ReactNode;
 }
 
 const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
-    const [user] = useAuthState(auth);
+    const [user, loading] = useAuthState(auth);
 
     return (
-        <UserProvider>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Box sx={{ width: '100%' }}>
-                    <ResponsiveAppBar />
-                    <Box>
-                        {user ? (
-                            children(user)
-                        ) : (
-                            <Typography variant="h6" align="center" sx={{ color: '#333' }}>
-                                Please log in to view.
-                            </Typography>
-                        )}
-                    </Box>
-                </Box>
-            </Box>
-        </UserProvider>
+        <>
+            <SiteHeader email={user?.email} />
+            <main className="mx-auto max-w-6xl px-4 pb-16">
+                {loading ? (
+                    <div className="flex justify-center py-24"><Spinner className="h-8 w-8" /></div>
+                ) : user ? (
+                    children(user)
+                ) : (
+                    <div className="py-24 text-center text-white">
+                        <p className="mb-4 text-lg">Your session has ended.</p>
+                        <Link href="/sign-in" className={buttonClasses('primary')}>Sign in again</Link>
+                    </div>
+                )}
+            </main>
+            <SiteFooter className="-mt-8" />
+        </>
     );
 };
 
