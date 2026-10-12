@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
@@ -8,24 +7,12 @@ import Cookies from "js-cookie";
 import { LogOut } from "lucide-react";
 import { auth } from "../firebase/firebaseConfig";
 import { cn } from "@/lib/utils";
+import { Logo } from "./Brand";
 
 const NAV = [
     { href: "/", label: "Spin" },
     { href: "/profile", label: "My spots" },
 ];
-
-export function Logo({ className }: { className?: string }) {
-    return (
-        <Image
-            src="/slots-of-flavor-high-resolution-logo-transparent.png"
-            alt="Slots of Flavor"
-            width={2000}
-            height={590}
-            className={cn("h-auto filter-[invert(1)_brightness(1.6)]", className)}
-            loading="eager"
-        />
-    );
-}
 
 export default function SiteHeader({ email }: { email?: string | null }) {
     const pathname = usePathname();
@@ -61,7 +48,7 @@ export default function SiteHeader({ email }: { email?: string | null }) {
     return (
         <header className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-5">
             <Link href="/" className="shrink-0 rounded-md focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-white/70">
-                <Logo className="w-28 sm:w-44" />
+                <Logo size="md" compact />
             </Link>
 
             <div className="flex items-center gap-1.5 sm:gap-3">

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { Logo } from './SiteHeader';
+import { Logo } from './Brand';
 import SiteFooter from './SiteFooter';
 import { Card } from './ui';
 import { CONTACT_EMAIL, LEGAL_EFFECTIVE_DATE } from '@/lib/legal';
@@ -9,7 +9,7 @@ export function LegalPage({ title, children }: { title: string; children: React.
     return (
         <div className="mx-auto max-w-3xl px-4">
             <header className="flex items-center justify-between py-5">
-                <Link href="/welcome"><Logo className="w-36 sm:w-44" /></Link>
+                <Link href="/welcome"><Logo size="md" compact /></Link>
                 <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-white/80 hover:text-white">
                     <ArrowLeft className="h-4 w-4" aria-hidden /> Back to the app
                 </Link>
