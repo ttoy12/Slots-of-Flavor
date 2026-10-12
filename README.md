@@ -88,7 +88,7 @@ Other scripts: `npm run build`, `npm run start` and `npm run lint`.
 
 - **Daily search limit:** `DAILY_SEARCH_LIMIT` in `lib/searchLimit.ts`. Change the matching `30` in `firestore.rules` too, and keep it within your Google Cloud quota.
 - **Contact email for the legal pages:** `CONTACT_EMAIL` in `lib/legal.ts`.
-- **Colors and fonts:** theme tokens in `app/globals.css` and `tailwind.config.ts`.
+- **Colors and fonts:** theme tokens in `app/globals.css`.
 
 ## Demo
 

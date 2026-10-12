@@ -41,7 +41,7 @@ function PlaceCard({ place, tab, userID, onUpdate }: { place: Business; tab: Tab
 
     return (
         <Card className={cn('flex flex-col overflow-hidden shadow-lg transition-opacity', busy && 'opacity-60')}>
-            <div className="relative aspect-[16/10] overflow-hidden bg-secondary">
+            <div className="relative aspect-16/10 overflow-hidden bg-secondary">
                 {place.image_url && !imageFailed ? (
                     // eslint-disable-next-line @next/next/no-img-element -- served via our signed photo redirect
                     <img src={place.image_url} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" onError={() => setImageFailed(true)} />
@@ -97,7 +97,7 @@ function MyPlaces({ user }: { user: User }) {
 
     return (
         <>
-            <div role="tablist" aria-label="Liked and disliked places" className="mb-6 inline-flex rounded-full border border-white/15 bg-white/10 p-1 backdrop-blur">
+            <div role="tablist" aria-label="Liked and disliked places" className="mb-6 inline-flex rounded-full border border-white/15 bg-white/10 p-1 backdrop-blur-sm">
                 {tabs.map(({ id, label, count }) => (
                     <button
                         key={id}

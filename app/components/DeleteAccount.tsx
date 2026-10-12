@@ -69,7 +69,7 @@ export default function DeleteAccount({ user, likedCount, dislikedCount }: {
             </Card>
 
             {open && (
-                <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-3 backdrop-blur-sm sm:items-center animate-in fade-in" onClick={close}>
+                <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-3 backdrop-blur-xs sm:items-center animate-in fade-in" onClick={close}>
                     <Card
                         role="alertdialog"
                         aria-modal="true"

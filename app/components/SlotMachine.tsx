@@ -27,7 +27,7 @@ function ReelWindow({ children }: { children: React.ReactNode }) {
         <div className="relative h-20 overflow-hidden rounded-2xl bg-black/50 ring-2 ring-accent/70 shadow-inner">
             {children}
             {/* fade the edges so names look like they roll past a window */}
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/60" />
+            <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-black/60 via-transparent to-black/60" />
         </div>
     );
 }
