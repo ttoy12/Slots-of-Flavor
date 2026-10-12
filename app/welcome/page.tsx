@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, Dices, MapPin, ThumbsUp } from 'lucide-react';
 import { Logo } from '../components/SiteHeader';
 import { buttonClasses } from '../components/ui';
+import SiteFooter from '../components/SiteFooter';
 
 const STEPS = [
     { icon: MapPin, title: 'Set the scene', body: 'Pick a city, a craving, how far you’ll go and what you want to spend.' },
@@ -9,13 +10,20 @@ const STEPS = [
     { icon: ThumbsUp, title: 'Like or dislike', body: 'Like it to save it, dislike it to never see it again, or just spin once more.' },
 ];
 
-export default function Welcome() {
+export default async function Welcome({ searchParams }: { searchParams: Promise<{ deleted?: string }> }) {
+    const { deleted } = await searchParams;
     return (
         <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-4">
             <header className="flex items-center justify-between py-5">
                 <Logo className="w-36 sm:w-44" />
                 <Link href="/sign-in" className={buttonClasses('glass', 'sm')}>Sign in</Link>
             </header>
+
+            {deleted && (
+                <p role="status" className="mt-4 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white backdrop-blur">
+                    Your account and everything saved with it have been deleted. Thanks for spinning with us.
+                </p>
+            )}
 
             <section className="flex flex-1 flex-col justify-center py-16 text-white">
                 <p className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm backdrop-blur">
@@ -36,7 +44,7 @@ export default function Welcome() {
                 </div>
             </section>
 
-            <section className="grid gap-4 pb-12 sm:grid-cols-3">
+            <section className="grid gap-4 sm:grid-cols-3">
                 {STEPS.map(({ icon: Icon, title, body }, i) => (
                     <div key={title} className="rounded-3xl border border-white/15 bg-white/10 p-5 text-white backdrop-blur-md">
                         <div className="mb-4 flex items-center justify-between">
@@ -50,6 +58,8 @@ export default function Welcome() {
                     </div>
                 ))}
             </section>
+
+            <SiteFooter />
         </div>
     );
 }

@@ -8,6 +8,9 @@ const MESSAGES: Record<string, string> = {
     "auth/too-many-requests": "Too many attempts. Wait a minute and try again.",
     "auth/network-request-failed": "Couldn't reach the server. Check your connection.",
     "auth/user-not-found": "No account found with that email.",
+    "auth/wrong-password": "That password isn't right.",
+    "auth/user-mismatch": "That Google account isn't the one you're signed in with.",
+    "auth/requires-recent-login": "For your security, sign out and back in, then try again.",
 };
 
 const IGNORED = new Set(["auth/popup-closed-by-user", "auth/cancelled-popup-request"]);

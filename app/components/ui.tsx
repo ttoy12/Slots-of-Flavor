@@ -29,7 +29,7 @@ export const buttonClasses = (variant: ButtonVariant = "primary", size: ButtonSi
         className
     );
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends React.ComponentPropsWithRef<'button'> {
     variant?: ButtonVariant;
     size?: ButtonSize;
     loading?: boolean;

@@ -49,7 +49,20 @@ Check out a short demo of the applicaiton on YouTube: [Slots of Flavor Demo](htt
    npm install
    ```
 
-4. Set up your environment variables: copy `.env.example` to `.env.local` and fill in your Google Places API key and Firebase configuration.
+4. Set up your environment variables: create a `.env.local` file with your Google Places API key and Firebase configuration:
+
+   ```
+   GOOGLE_PLACES_API_KEY=
+   NEXT_PUBLIC_FIREBASE_API_KEY=
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+   NEXT_PUBLIC_FIREBASE_APP_ID=
+   NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
+   ```
+
+   `GOOGLE_PLACES_API_KEY` is server-only, so never prefix it with `NEXT_PUBLIC_`.
 
    To get a Google key:
    - Create a project in [Google Cloud Console](https://console.cloud.google.com/) and attach a billing account (required even for free usage).

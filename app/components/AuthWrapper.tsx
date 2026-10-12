@@ -6,6 +6,7 @@ import type { User } from 'firebase/auth';
 import { auth } from '../firebase/firebaseConfig';
 import SiteHeader from './SiteHeader';
 import { buttonClasses, Spinner } from './ui';
+import SiteFooter from './SiteFooter';
 
 interface AuthWrapperProps {
     children: (user: User) => React.ReactNode;
@@ -29,6 +30,7 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
                     </div>
                 )}
             </main>
+            <SiteFooter className="-mt-8" />
         </>
     );
 };

@@ -64,6 +64,11 @@ const SignUp: React.FC = () => {
                 {error && <Alert>{error}</Alert>}
                 <Button type="submit" className="w-full" loading={pending === 'email'} disabled={pending !== null}>Create account</Button>
             </form>
+            <p className="mt-4 text-center text-xs text-muted-foreground">
+                By creating an account, you agree to our{' '}
+                <Link href="/terms" className="font-medium text-foreground underline underline-offset-2">Terms of Service</Link> and{' '}
+                <Link href="/privacy" className="font-medium text-foreground underline underline-offset-2">Privacy Policy</Link>.
+            </p>
         </AuthShell>
     );
 };

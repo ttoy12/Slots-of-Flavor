@@ -2,7 +2,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Dices, MapPin, Navigation, Star, ThumbsDown, ThumbsUp, Trash2, UtensilsCrossed } from 'lucide-react';
+import type { User } from 'firebase/auth';
 import AuthWrapper from '../components/AuthWrapper';
+import DeleteAccount from '../components/DeleteAccount';
 import { buttonClasses, Card, Spinner } from '../components/ui';
 import useFetchLikedAndDislikedPlaces from '../hooks/useFetchLikedAndDislikedPlaces';
 import { addDislikedPlace, addLikedPlace, Business, formatAddress, removedDislikedPlace, removedLikedPlace } from '../firebase/firestore';
@@ -82,7 +84,8 @@ function PlaceCard({ place, tab, userID, onUpdate }: { place: Business; tab: Tab
     );
 }
 
-function MyPlaces({ userID }: { userID: string }) {
+function MyPlaces({ user }: { user: User }) {
+    const userID = user.uid;
     const [tab, setTab] = useState<Tab>('liked');
     const { likedPlaces, dislikedPlaces, loading, handleUpdate } = useFetchLikedAndDislikedPlaces(userID);
     const places = tab === 'liked' ? likedPlaces : dislikedPlaces;
@@ -140,6 +143,8 @@ function MyPlaces({ userID }: { userID: string }) {
                     ))}
                 </div>
             )}
+
+            {!loading && <DeleteAccount user={user} likedCount={likedPlaces.length} dislikedCount={dislikedPlaces.length} />}
         </>
     );
 }
@@ -153,7 +158,7 @@ export default function Profile() {
                         <p className="text-sm text-white/70">{user.email}</p>
                         <h1 className="mt-1 text-4xl font-extrabold sm:text-5xl">Your spots</h1>
                     </div>
-                    <MyPlaces userID={user.uid} />
+                    <MyPlaces user={user} />
                 </div>
             )}
         </AuthWrapper>

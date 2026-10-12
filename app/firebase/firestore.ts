@@ -96,3 +96,14 @@ export const getSearchesRemaining = async (): Promise<number | null> => {
         return null;
     }
 };
+
+// Deletes everything stored for a user: their liked/disliked places and user doc.
+export const deleteUserData = async (userID: string) => {
+    const batch = writeBatch(db);
+    for (const list of ['liked', 'disliked'] as const) {
+        const snapshot = await getDocs(collection(db, 'users', userID, list));
+        snapshot.docs.forEach((d) => batch.delete(d.ref));
+    }
+    batch.delete(doc(db, 'users', userID));
+    await batch.commit();
+};

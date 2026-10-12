@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 import { Logo } from './SiteHeader';
 import { Card, Input } from './ui';
+import SiteFooter from './SiteFooter';
 
 export function AuthShell({ title, subtitle, children, footer }: {
     title: string;
@@ -23,6 +24,7 @@ export function AuthShell({ title, subtitle, children, footer }: {
                 {children}
             </Card>
             <p className="mt-6 text-sm text-white/80">{footer}</p>
+            <SiteFooter className="pb-0" />
         </div>
     );
 }
