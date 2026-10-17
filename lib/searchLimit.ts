@@ -1,12 +1,24 @@
-// Shared by the server route and the UI. Keep DAILY_SEARCH_LIMIT in sync with
-// the cap in firestore.rules (usage/{day}) and the Google Cloud quota.
+// Shared by the server route and the UI. Keep both limits in sync with the
+// caps in firestore.rules (usage/{day} and usage/{day}/users/{uid}), and keep
+// DAILY_SEARCH_LIMIT within the Google Cloud quota.
 export const DAILY_SEARCH_LIMIT = 30;
+export const USER_DAILY_SEARCH_LIMIT = 5;
 
 // Google's per-day quotas reset at midnight Pacific, so the app's counter does too.
 const TIME_ZONE = 'America/Los_Angeles';
 
 export const usageDayKey = (date = new Date()) =>
     new Intl.DateTimeFormat('en-CA', { timeZone: TIME_ZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
+
+// Searches used today: by everyone, and by the signed-in user.
+export interface SearchUsage {
+    total: number;
+    user: number;
+}
+
+// Whichever limit runs out first decides how many searches are left.
+export const searchesRemaining = ({ total, user }: SearchUsage) =>
+    Math.max(Math.min(DAILY_SEARCH_LIMIT - total, USER_DAILY_SEARCH_LIMIT - user), 0);
 
 export function timeUntilReset(date = new Date()): string {
     const parts = Object.fromEntries(

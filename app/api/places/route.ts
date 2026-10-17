@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import type { Business } from "@/app/firebase/firestore";
 import { signedPhotoUrl } from "@/lib/photoSignature";
 import { getBearerToken, verifyFirebaseToken } from "@/lib/verifyFirebaseToken";
-import { DAILY_SEARCH_LIMIT, SearchError, timeUntilReset } from "@/lib/searchLimit";
-import { getSearchesUsed, recordSearch } from "@/lib/searchUsage";
+import { DAILY_SEARCH_LIMIT, SearchError, searchesRemaining, timeUntilReset, USER_DAILY_SEARCH_LIMIT } from "@/lib/searchLimit";
+import { getSearchUsage, recordSearch } from "@/lib/searchUsage";
 
 const API_KEY = process.env.GOOGLE_PLACES_API_KEY;
 
@@ -68,7 +68,10 @@ const fail = (status: number, code: SearchError["code"], title: string, hint: st
     new SearchFailure(status, { code, title, hint, retryable });
 
 const dailyLimitFailure = () => fail(429, "DAILY_LIMIT", "Out of searches for today",
-    `All ${DAILY_SEARCH_LIMIT} daily searches are used up. They reset in ${timeUntilReset()} (midnight Pacific). You can still use "Spin again" on results you already have.`);
+    `All ${DAILY_SEARCH_LIMIT} searches the app allows each day are used up. They reset in ${timeUntilReset()} (midnight Pacific). You can still use "Spin again" on results you already have.`);
+
+const userLimitFailure = () => fail(429, "DAILY_LIMIT", "You're out of searches for today",
+    `You've used all ${USER_DAILY_SEARCH_LIMIT} of your daily searches. They reset in ${timeUntilReset()} (midnight Pacific). You can still use "Spin again" on results you already have.`);
 
 const upstreamFailure = () => fail(502, "UPSTREAM", "Google Maps didn't respond",
     "This is usually a temporary hiccup. Give it a moment and try again.", true);
@@ -173,7 +176,8 @@ async function search(req: Request) {
 
     // Every search is billed, so only signed-in users may run one.
     const idToken = getBearerToken(req);
-    if (!idToken || !(await verifyFirebaseToken(req))) {
+    const uid = await verifyFirebaseToken(req);
+    if (!idToken || !uid) {
         throw fail(401, "UNAUTHENTICATED", "Your session has expired", "Sign in again to keep searching.");
     }
 
@@ -187,10 +191,11 @@ async function search(req: Request) {
         throw fail(400, "BAD_REQUEST", "Where are you eating?", "Enter a city to search.");
     }
 
-    // The shared daily counter. If it can't be read, fail open: the Google
-    // Cloud quota still stops searches past the limit.
-    const used = await getSearchesUsed(idToken);
-    if (used !== null && used >= DAILY_SEARCH_LIMIT) throw dailyLimitFailure();
+    // The daily counters. If they can't be read, fail open: the Google Cloud
+    // quota still stops searches past the limit.
+    const used = await getSearchUsage(idToken, uid);
+    if (used && used.user >= USER_DAILY_SEARCH_LIMIT) throw userLimitFailure();
+    if (used && used.total >= DAILY_SEARCH_LIMIT) throw dailyLimitFailure();
 
     const body: Record<string, unknown> = {
         textQuery: `${term} in ${location}`,
@@ -230,8 +235,8 @@ async function search(req: Request) {
     }
 
     // Only successful searches count toward the daily limit.
-    const usedNow = await recordSearch(idToken);
-    const remaining = usedNow === null ? null : Math.max(DAILY_SEARCH_LIMIT - usedNow, 0);
+    const usedNow = await recordSearch(idToken, uid);
+    const remaining = usedNow && searchesRemaining(usedNow);
 
     return NextResponse.json({ places: places.map(toBusiness), remaining });
 }

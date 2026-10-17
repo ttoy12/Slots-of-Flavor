@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ContactLink, ExternalLink, LegalPage, List, Section } from '../components/LegalPage';
-import { DAILY_SEARCH_LIMIT } from '@/lib/searchLimit';
+import { DAILY_SEARCH_LIMIT, USER_DAILY_SEARCH_LIMIT } from '@/lib/searchLimit';
 
 export const metadata: Metadata = { title: 'Terms of Service · Slots of Flavor' };
 
@@ -58,8 +58,8 @@ export default function Terms() {
 
             <Section title="Search limit and availability">
                 <p>
-                    To keep the app free, it allows {DAILY_SEARCH_LIMIT} searches per day, shared across all users and reset at
-                    midnight Pacific Time. We may change this limit, change or remove features, or stop running the app at any
+                    To keep the app free, each user gets {USER_DAILY_SEARCH_LIMIT} searches per day, and the app allows{' '}
+                    {DAILY_SEARCH_LIMIT} searches per day across all users. Both reset at midnight Pacific Time. We may change this limit, change or remove features, or stop running the app at any
                     time, with or without notice.
                 </p>
             </Section>

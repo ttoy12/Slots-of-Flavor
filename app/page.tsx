@@ -11,7 +11,7 @@ import SlotMachine, { MachineStatus, Spin } from './components/SlotMachine';
 import { Button, Card, Chip, Field, Input } from './components/ui';
 import useIsMobile from './hooks/useIsMobile';
 import { cn } from '@/lib/utils';
-import { DAILY_SEARCH_LIMIT, SearchError } from '@/lib/searchLimit';
+import { SearchError, USER_DAILY_SEARCH_LIMIT } from '@/lib/searchLimit';
 
 const CRAVINGS = ['Pizza', 'Sushi', 'Tacos', 'Burgers', 'Ramen', 'Thai', 'Brunch', 'Bar'];
 
@@ -91,7 +91,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!user) return;
-    getSearchesRemaining().then(setRemaining);
+    getSearchesRemaining(user.uid).then(setRemaining);
   }, [user]);
 
   const getBusinessList = async (location: string) => {
@@ -251,7 +251,7 @@ export default function Home() {
                     <p className={cn('text-center text-xs', outOfSearches ? 'text-destructive' : 'text-muted-foreground')} aria-live="polite">
                       {outOfSearches
                         ? 'Searches reset at midnight Pacific. You can still use "Spin again" on results you already have.'
-                        : `${remaining} of ${DAILY_SEARCH_LIMIT} searches left today`}
+                        : `${remaining} of ${USER_DAILY_SEARCH_LIMIT} searches left today`}
                     </p>
                   )}
                 </div>

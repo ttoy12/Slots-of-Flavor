@@ -7,19 +7,33 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Shared daily search counter, one doc per day (usage/YYYY-MM-DD).
-    // It can only go up one at a time and never past 30, so nobody can reset
-    // it from the browser. Keep 30 in sync with DAILY_SEARCH_LIMIT in
-    // lib/searchLimit.ts.
+    // Daily search counters, one set per day:
+    //   usage/{day}               all searches today (at most 30)
+    //   usage/{day}/users/{uid}   one user's searches today (at most 5)
+    // Counts only go up one at a time and can never be deleted, so nobody can
+    // reset them from the browser. The shared count can only go up together
+    // with the caller's own count, so one user can use at most 5 of the 30.
+    // Keep 30 and 5 in sync with lib/searchLimit.ts.
+    function isNextCount(limit) {
+      return request.resource.data.keys().hasOnly(['count'])
+        && request.resource.data.count == (resource == null ? 0 : resource.data.count) + 1
+        && request.resource.data.count <= limit;
+    }
+
+    // True when the same write also adds one to the caller's own counter.
+    function countsForCaller(day) {
+      let mine = /databases/$(database)/documents/usage/$(day)/users/$(request.auth.uid);
+      return getAfter(mine).data.count == (exists(mine) ? get(mine).data.count : 0) + 1;
+    }
+
     match /usage/{day} {
       allow read: if request.auth != null;
-      allow create: if request.auth != null
-        && request.resource.data.keys().hasOnly(['count'])
-        && request.resource.data.count == 1;
-      allow update: if request.auth != null
-        && request.resource.data.keys().hasOnly(['count'])
-        && request.resource.data.count == resource.data.count + 1
-        && request.resource.data.count <= 30;
+      allow create, update: if request.auth != null && isNextCount(30) && countsForCaller(day);
+
+      match /users/{userId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow create, update: if request.auth != null && request.auth.uid == userId && isNextCount(5);
+      }
     }
   }
 }

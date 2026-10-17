@@ -18,7 +18,7 @@ Slots of Flavor picks a random restaurant for you. Tell it where you are, what y
 - **Filters.** Location (with city autocomplete), craving, distance (1–25 miles) and price ($–$$$$). Only places open right now are shown.
 - **Like or dislike.** Liked places are saved to My spots. Disliked places never come up in your spins again (you can move them back any time).
 - **Built for phones.** On mobile the result opens in a full-screen sheet, so the reel is always in view.
-- **Daily search limit.** The app allows 30 searches a day, shared by all users, and shows how many are left. It resets at midnight Pacific.
+- **Daily search limit.** Each user gets 5 searches a day, with a cap of 30 a day across all users, and the app shows how many are left. Both reset at midnight Pacific.
 - **Helpful errors.** If a search fails, the app says why (location not found, Google not responding, offline, out of searches) and offers to try again when that would help.
 - **Accounts.** Email/password or Google sign-in with Firebase Authentication. Users can delete their account and all saved data from My spots.
 - **Terms of Service and Privacy Policy** pages, linked across the site.
@@ -35,7 +35,7 @@ Slots of Flavor picks a random restaurant for you. Tell it where you are, what y
 
 - **Search:** `app/api/places/route.ts` runs a Google Places Text Search for open restaurants. When a distance is chosen, it geocodes the location and keeps only results within that radius.
 - **Security:** the search route only accepts requests with a valid Firebase sign-in token. Place photos are served through `app/api/places/photo/route.ts` with signed URLs, so the Google API key never reaches the browser.
-- **Search limit:** a counter document per day (`usage/YYYY-MM-DD`) in Firestore tracks searches. The server checks it before calling Google, and Firestore rules only let it go up by one, never past 30.
+- **Search limit:** Firestore keeps two counters per day: `usage/YYYY-MM-DD` for all searches and `usage/YYYY-MM-DD/users/{uid}` for each user. The server checks both before calling Google. Firestore rules only let a count go up by one (never past 30 total or 5 per user), and the total can only go up in the same write as the caller's own count, so no one can use up other people's searches.
 - **Saved places:** stored at `users/{uid}/liked/{placeId}` and `users/{uid}/disliked/{placeId}`.
 
 ## Running it locally
@@ -84,9 +84,16 @@ Slots of Flavor picks a random restaurant for you. Tell it where you are, what y
 
 Other scripts: `npm run build`, `npm run start` and `npm run lint`.
 
+## Tests
+
+- `npm test` runs the unit tests.
+- `npm run test:rules` checks `firestore.rules` against the Firestore emulator, including that no one can use up other people's searches. It needs Java 11 or newer and downloads the Firebase CLI on first run.
+
+Run `npm run test:rules` after any change to `firestore.rules`, then publish the rules (paste them into the console, or run `npx firebase-tools deploy --only firestore:rules --project <your-project-id>`).
+
 ## Configuration
 
-- **Daily search limit:** `DAILY_SEARCH_LIMIT` in `lib/searchLimit.ts`. Change the matching `30` in `firestore.rules` too, and keep it within your Google Cloud quota.
+- **Daily search limits:** `USER_DAILY_SEARCH_LIMIT` (per user) and `DAILY_SEARCH_LIMIT` (all users) in `lib/searchLimit.ts`. Change the matching `5` and `30` in `firestore.rules` too, and keep the total within your Google Cloud quota.
 - **Contact email for the legal pages:** `CONTACT_EMAIL` in `lib/legal.ts`.
 - **Colors and fonts:** theme tokens in `app/globals.css`.
 

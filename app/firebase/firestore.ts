@@ -1,6 +1,6 @@
 import { collection, deleteDoc, deleteField, doc, getDoc, getDocs, orderBy, query, serverTimestamp, setDoc, writeBatch } from 'firebase/firestore';
 import { db } from './firebaseConfig';
-import { DAILY_SEARCH_LIMIT, usageDayKey } from '@/lib/searchLimit';
+import { searchesRemaining, usageDayKey } from '@/lib/searchLimit';
 
 // Normalized restaurant shape returned by /api/places and stored in Firestore.
 // Places saved before the Google Places migration still have Yelp's shape
@@ -85,12 +85,16 @@ export const addDislikedPlace = (userID: string, business: Business) => savePlac
 export const removedLikedPlace = (userID: string, business: Business) => removePlace(userID, 'liked', business);
 export const removedDislikedPlace = (userID: string, business: Business) => removePlace(userID, 'disliked', business);
 
-// Searches left today from the shared counter at usage/{day}, or null if it
-// can't be read. The server enforces the limit; this is just for display.
-export const getSearchesRemaining = async (): Promise<number | null> => {
+// Searches left today from the counters at usage/{day} and
+// usage/{day}/users/{uid}, or null if they can't be read. The server enforces
+// the limits; this is just for display.
+export const getSearchesRemaining = async (userID: string): Promise<number | null> => {
     try {
-        const usage = await getDoc(doc(db, 'usage', usageDayKey()));
-        return Math.max(DAILY_SEARCH_LIMIT - (usage.data()?.count ?? 0), 0);
+        const [total, user] = await Promise.all([
+            getDoc(doc(db, 'usage', usageDayKey())),
+            getDoc(doc(db, 'usage', usageDayKey(), 'users', userID)),
+        ]);
+        return searchesRemaining({ total: total.data()?.count ?? 0, user: user.data()?.count ?? 0 });
     } catch (error) {
         console.warn('Could not read search usage', error);
         return null;
