@@ -20,6 +20,11 @@ export default function Privacy() {
                         (Firebase Authentication). Our own database stores only your email and account ID.
                     </li>
                     <li>
+                        <strong>Guest sessions.</strong> If you try the app without an account, Firebase Authentication gives
+                        your browser an anonymous account ID with no name or email. If you then create an account, anything
+                        you liked or disliked as a guest moves to your new account.
+                    </li>
+                    <li>
                         <strong>Places you like or dislike.</strong> When you tap Like or Dislike, we save that restaurant&rsquo;s
                         name, address, rating, price level, Google Maps link and photo link, along with when you saved it.
                     </li>

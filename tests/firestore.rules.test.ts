@@ -8,6 +8,9 @@ const DAY = '2026-10-17';
 let env: RulesTestEnvironment;
 
 const dbFor = (uid: string) => env.authenticatedContext(uid).firestore() as unknown as Firestore;
+// A visitor trying the app before signing up (Firebase anonymous sign-in).
+const guestDbFor = (uid: string) =>
+    env.authenticatedContext(uid, { firebase: { sign_in_provider: 'anonymous' } }).firestore() as unknown as Firestore;
 const totalRef = (db: Firestore) => doc(db, 'usage', DAY);
 const userRef = (db: Firestore, uid: string) => doc(db, 'usage', DAY, 'users', uid);
 
@@ -41,6 +44,18 @@ describe('daily search counters', () => {
         const db = dbFor('alice');
         for (let i = 0; i < 5; i++) await assertSucceeds(recordSearch(db, 'alice'));
         await assertFails(recordSearch(db, 'alice'));
+    });
+
+    it('stops a guest after 1 search', async () => {
+        const db = guestDbFor('guest');
+        await assertSucceeds(recordSearch(db, 'guest'));
+        await assertFails(recordSearch(db, 'guest'));
+    });
+
+    it('gives a guest who signs up the full limit', async () => {
+        await seed(['usage', DAY], 1);
+        await seed(['usage', DAY, 'users', 'guest'], 1);
+        await assertSucceeds(recordSearch(dbFor('guest'), 'guest'));
     });
 
     it('lets other users keep searching when one is out', async () => {

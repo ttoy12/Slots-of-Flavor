@@ -88,13 +88,13 @@ export const removedDislikedPlace = (userID: string, business: Business) => remo
 // Searches left today from the counters at usage/{day} and
 // usage/{day}/users/{uid}, or null if they can't be read. The server enforces
 // the limits; this is just for display.
-export const getSearchesRemaining = async (userID: string): Promise<number | null> => {
+export const getSearchesRemaining = async (userID: string, isGuest: boolean): Promise<number | null> => {
     try {
         const [total, user] = await Promise.all([
             getDoc(doc(db, 'usage', usageDayKey())),
             getDoc(doc(db, 'usage', usageDayKey(), 'users', userID)),
         ]);
-        return searchesRemaining({ total: total.data()?.count ?? 0, user: user.data()?.count ?? 0 });
+        return searchesRemaining({ total: total.data()?.count ?? 0, user: user.data()?.count ?? 0 }, isGuest);
     } catch (error) {
         console.warn('Could not read search usage', error);
         return null;

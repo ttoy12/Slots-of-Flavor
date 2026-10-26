@@ -9,11 +9,12 @@ service cloud.firestore {
 
     // Daily search counters, one set per day:
     //   usage/{day}               all searches today (at most 30)
-    //   usage/{day}/users/{uid}   one user's searches today (at most 5)
+    //   usage/{day}/users/{uid}   one user's searches today (at most 5, or 1
+    //                             for guests signed in anonymously)
     // Counts only go up one at a time and can never be deleted, so nobody can
     // reset them from the browser. The shared count can only go up together
     // with the caller's own count, so one user can use at most 5 of the 30.
-    // Keep 30 and 5 in sync with lib/searchLimit.ts.
+    // Keep 30, 5 and 1 in sync with lib/searchLimit.ts.
     function isNextCount(limit) {
       return request.resource.data.keys().hasOnly(['count'])
         && request.resource.data.count == (resource == null ? 0 : resource.data.count) + 1
@@ -26,13 +27,17 @@ service cloud.firestore {
       return getAfter(mine).data.count == (exists(mine) ? get(mine).data.count : 0) + 1;
     }
 
+    function userLimit() {
+      return request.auth.token.get('firebase', {}).get('sign_in_provider', '') == 'anonymous' ? 1 : 5;
+    }
+
     match /usage/{day} {
       allow read: if request.auth != null;
       allow create, update: if request.auth != null && isNextCount(30) && countsForCaller(day);
 
       match /users/{userId} {
         allow read: if request.auth != null && request.auth.uid == userId;
-        allow create, update: if request.auth != null && request.auth.uid == userId && isNextCount(5);
+        allow create, update: if request.auth != null && request.auth.uid == userId && isNextCount(userLimit());
       }
     }
   }

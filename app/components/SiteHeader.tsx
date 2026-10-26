@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 import { LogOut } from "lucide-react";
 import { auth } from "../firebase/firebaseConfig";
 import { cn } from "@/lib/utils";
+import { buttonClasses } from "./ui";
 import { Logo } from "./Brand";
 
 const NAV = [
@@ -14,7 +15,7 @@ const NAV = [
     { href: "/profile", label: "My spots" },
 ];
 
-export default function SiteHeader({ email }: { email?: string | null }) {
+export default function SiteHeader({ email, isGuest }: { email?: string | null; isGuest?: boolean }) {
     const pathname = usePathname();
     const router = useRouter();
     const [menuOpen, setMenuOpen] = useState(false);
@@ -68,33 +69,37 @@ export default function SiteHeader({ email }: { email?: string | null }) {
                     ))}
                 </nav>
 
-                <div className="relative" ref={menuRef}>
-                    <button
-                        onClick={() => setMenuOpen((open) => !open)}
-                        aria-haspopup="menu"
-                        aria-expanded={menuOpen}
-                        aria-label="Account menu"
-                        className="flex h-10 w-10 items-center justify-center rounded-full bg-accent font-display text-base font-bold uppercase text-accent-foreground ring-2 ring-white/30 transition hover:ring-white/60 focus-visible:outline-hidden focus-visible:ring-white"
-                    >
-                        {email?.[0] ?? "?"}
-                    </button>
-                    {menuOpen && (
-                        <div
-                            role="menu"
-                            className="absolute right-0 z-30 mt-2 w-60 overflow-hidden rounded-2xl bg-card p-1.5 shadow-xl ring-1 ring-black/5 animate-in fade-in slide-in-from-top-1"
+                {isGuest ? (
+                    <Link href="/sign-up" className={buttonClasses("primary", "sm", "whitespace-nowrap")}>Sign up</Link>
+                ) : (
+                    <div className="relative" ref={menuRef}>
+                        <button
+                            onClick={() => setMenuOpen((open) => !open)}
+                            aria-haspopup="menu"
+                            aria-expanded={menuOpen}
+                            aria-label="Account menu"
+                            className="flex h-10 w-10 items-center justify-center rounded-full bg-accent font-display text-base font-bold uppercase text-accent-foreground ring-2 ring-white/30 transition hover:ring-white/60 focus-visible:outline-hidden focus-visible:ring-white"
                         >
-                            <p className="truncate px-3 py-2 text-xs text-muted-foreground">{email}</p>
-                            <button
-                                role="menuitem"
-                                onClick={handleLogout}
-                                className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium hover:bg-secondary"
+                            {email?.[0] ?? "?"}
+                        </button>
+                        {menuOpen && (
+                            <div
+                                role="menu"
+                                className="absolute right-0 z-30 mt-2 w-60 overflow-hidden rounded-2xl bg-card p-1.5 shadow-xl ring-1 ring-black/5 animate-in fade-in slide-in-from-top-1"
                             >
-                                <LogOut className="h-4 w-4" aria-hidden />
-                                Sign out
-                            </button>
-                        </div>
-                    )}
-                </div>
+                                <p className="truncate px-3 py-2 text-xs text-muted-foreground">{email}</p>
+                                <button
+                                    role="menuitem"
+                                    onClick={handleLogout}
+                                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium hover:bg-secondary"
+                                >
+                                    <LogOut className="h-4 w-4" aria-hidden />
+                                    Sign out
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
         </header>
     );

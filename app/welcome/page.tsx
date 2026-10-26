@@ -1,8 +1,10 @@
 import Link from 'next/link';
-import { ArrowRight, Dices, MapPin, ThumbsUp } from 'lucide-react';
+import { Dices, MapPin, ThumbsUp } from 'lucide-react';
 import { Logo } from '../components/Brand';
 import { buttonClasses } from '../components/ui';
 import SiteFooter from '../components/SiteFooter';
+import GuestStartButton from '../components/GuestStartButton';
+import WelcomeDemo from '../components/WelcomeDemo';
 
 const STEPS = [
     { icon: MapPin, title: 'Set the scene', body: 'Pick a city, a craving, how far you’ll go and what you want to spend.' },
@@ -25,22 +27,27 @@ export default async function Welcome({ searchParams }: { searchParams: Promise<
                 </p>
             )}
 
-            <section className="flex flex-1 flex-col justify-center py-16 text-white">
-                <p className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm backdrop-blur-sm">
-                    <span className="h-2 w-2 rounded-full bg-accent" /> Only shows places open right now
-                </p>
-                <h1 className="max-w-3xl text-5xl font-extrabold leading-[1.05] sm:text-7xl text-balance">
-                    Can&rsquo;t decide where to eat? <span className="text-accent">Pull the lever.</span>
-                </h1>
-                <p className="mt-6 max-w-xl text-lg text-white/80">
-                    Tell us where you are and what you&rsquo;re in the mood for. We&rsquo;ll spin up a random restaurant
-                    nearby, so you can stop scrolling and start eating.
-                </p>
-                <div className="mt-10 flex flex-wrap gap-3">
-                    <Link href="/sign-up" className={buttonClasses('primary', 'lg')}>
-                        Start spinning <ArrowRight className="h-5 w-5" aria-hidden />
-                    </Link>
-                    <Link href="/sign-in" className={buttonClasses('glass', 'lg')}>I have an account</Link>
+            <section className="grid flex-1 items-center gap-10 py-12 text-white sm:py-16 lg:grid-cols-[1fr_minmax(0,460px)]">
+                <div>
+                    <p className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm backdrop-blur-sm">
+                        <span className="h-2 w-2 rounded-full bg-accent" /> Only shows places open right now
+                    </p>
+                    <h1 className="max-w-3xl text-5xl font-extrabold leading-[1.05] sm:text-7xl lg:text-6xl xl:text-7xl text-balance">
+                        Can&rsquo;t decide where to eat? <span className="text-accent">Pull the lever.</span>
+                    </h1>
+                    <p className="mt-6 max-w-xl text-lg text-white/80">
+                        Tell us where you are and what you&rsquo;re in the mood for. We&rsquo;ll spin up a random restaurant
+                        nearby, so you can stop scrolling and start eating.
+                    </p>
+                    <div className="mt-10 flex flex-wrap gap-3">
+                        <GuestStartButton />
+                        <Link href="/sign-up" className={buttonClasses('glass', 'lg')}>Create an account</Link>
+                    </div>
+                    <p className="mt-3 text-sm text-white/70">No account needed for your first search.</p>
+                </div>
+                <div className="text-foreground">
+                    <p className="mb-2 text-sm font-semibold text-white/80">Pick a craving to spin. These are sample restaurants.</p>
+                    <WelcomeDemo />
                 </div>
             </section>
 

@@ -17,7 +17,7 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
 
     return (
         <>
-            <SiteHeader email={user?.email} />
+            <SiteHeader email={user?.email} isGuest={user?.isAnonymous} />
             <main className="mx-auto max-w-6xl px-4 pb-16">
                 {loading ? (
                     <div className="flex justify-center py-24"><Spinner className="h-8 w-8" /></div>

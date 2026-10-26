@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
-import { Dices, History, RotateCw, SlidersHorizontal, X } from 'lucide-react';
+import Link from 'next/link';
+import { Dices, History, RotateCw, SlidersHorizontal, UserPlus, X } from 'lucide-react';
 import AuthWrapper from './components/AuthWrapper';
 import useFetchLikedAndDislikedPlaces from './hooks/useFetchLikedAndDislikedPlaces';
 import { Business, getSearchesRemaining } from './firebase/firestore';
@@ -8,7 +9,8 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from './firebase/firebaseConfig';
 import LocationAutocomplete from './components/LocationAutocomplete';
 import SlotMachine, { MachineStatus, Spin } from './components/SlotMachine';
-import { Button, Card, Chip, Field, Input } from './components/ui';
+import { buildSpin, pickRandom } from '@/lib/spin';
+import { Button, buttonClasses, Card, Chip, Field, Input } from './components/ui';
 import useIsMobile from './hooks/useIsMobile';
 import { cn } from '@/lib/utils';
 import { SearchError, USER_DAILY_SEARCH_LIMIT } from '@/lib/searchLimit';
@@ -38,21 +40,6 @@ const unknownError = (): SearchError => ({
   hint: 'The search failed for an unexpected reason. Try again in a moment.',
   retryable: true,
 });
-const REEL_LENGTH = 16;
-
-// Picks a random business, avoiding `exclude` so "Spin again" always changes.
-const pickRandom = (list: Business[], exclude?: Business | null) => {
-  const candidates = list.length > 1 && exclude ? list.filter(b => b.id !== exclude.id) : list;
-  return candidates.length ? candidates[Math.floor(Math.random() * candidates.length)] : null;
-};
-
-// Builds the names the reel rolls through before landing on `business`.
-const buildSpin = (list: Business[], business: Business): Spin => {
-  const others = list.filter(b => b.id !== business.id).map(b => b.name);
-  const filler = others.length ? others : ['…'];
-  const strip = Array.from({ length: REEL_LENGTH }, () => filler[Math.floor(Math.random() * filler.length)]);
-  return { id: Date.now(), business, strip: [...strip, business.name] };
-};
 
 export default function Home() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
@@ -88,10 +75,11 @@ export default function Home() {
   const [user] = useAuthState(auth);
   const { likedPlaces, dislikedPlaces } = useFetchLikedAndDislikedPlaces(user?.uid);
   const outOfSearches = remaining === 0;
+  const isGuest = !!user?.isAnonymous;
 
   useEffect(() => {
     if (!user) return;
-    getSearchesRemaining(user.uid).then(setRemaining);
+    getSearchesRemaining(user.uid, user.isAnonymous).then(setRemaining);
   }, [user]);
 
   const getBusinessList = async (location: string) => {
@@ -124,7 +112,7 @@ export default function Home() {
     const data = await response.json().catch(() => null);
     if (!response.ok || !data) {
       const searchError: SearchError = data?.error?.title ? data.error : unknownError();
-      if (searchError.code === 'DAILY_LIMIT') setRemaining(0);
+      if (searchError.code === 'DAILY_LIMIT' || searchError.code === 'GUEST_LIMIT') setRemaining(0);
       // Keep any earlier results so "Spin again" still works.
       setError(searchError);
       setStatus('error');
@@ -180,7 +168,7 @@ export default function Home() {
       {(user) => (
         <div className="pt-4">
           <div className="mb-8 text-white">
-            <p className="text-sm text-white/70">Hey {user.displayName?.split(' ')[0] ?? user.email?.split('@')[0]} 👋</p>
+            <p className="text-sm text-white/70">Hey {user.displayName?.split(' ')[0] ?? user.email?.split('@')[0] ?? 'there'} 👋</p>
             <h1 className="mt-1 text-4xl font-extrabold sm:text-5xl text-balance">Where are we eating tonight?</h1>
           </div>
 
@@ -243,15 +231,25 @@ export default function Home() {
                 </fieldset>
 
                 <div className="space-y-2">
-                  <Button type="submit" size="lg" className="w-full" loading={status === 'loading'} disabled={outOfSearches}>
-                    {status !== 'loading' && <Dices className="h-5 w-5" aria-hidden />}
-                    {status === 'loading' ? 'Spinning…' : outOfSearches ? 'Out of searches today' : 'Pull the lever'}
-                  </Button>
+                  {isGuest && outOfSearches ? (
+                    <Link href="/sign-up" className={buttonClasses('primary', 'lg', 'w-full')}>
+                      <UserPlus className="h-5 w-5" aria-hidden /> Sign up to keep spinning
+                    </Link>
+                  ) : (
+                    <Button type="submit" size="lg" className="w-full" loading={status === 'loading'} disabled={outOfSearches}>
+                      {status !== 'loading' && <Dices className="h-5 w-5" aria-hidden />}
+                      {status === 'loading' ? 'Spinning…' : outOfSearches ? 'Out of searches today' : 'Pull the lever'}
+                    </Button>
+                  )}
                   {remaining !== null && (
-                    <p className={cn('text-center text-xs', outOfSearches ? 'text-destructive' : 'text-muted-foreground')} aria-live="polite">
-                      {outOfSearches
-                        ? 'Searches reset at midnight Pacific. You can still use "Spin again" on results you already have.'
-                        : `${remaining} of ${USER_DAILY_SEARCH_LIMIT} searches left today`}
+                    <p className={cn('text-center text-xs', outOfSearches && !isGuest ? 'text-destructive' : 'text-muted-foreground')} aria-live="polite">
+                      {isGuest
+                        ? outOfSearches
+                          ? `That was your free search. A free account gets ${USER_DAILY_SEARCH_LIMIT} a day, and you can still use "Spin again" on these results.`
+                          : `You get ${remaining === 1 ? 'a free search' : `${remaining} free searches`} as a guest. No account needed.`
+                        : outOfSearches
+                          ? 'Searches reset at midnight Pacific. You can still use "Spin again" on results you already have.'
+                          : `${remaining} of ${USER_DAILY_SEARCH_LIMIT} searches left today`}
                     </p>
                   )}
                 </div>

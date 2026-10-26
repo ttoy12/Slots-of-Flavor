@@ -3,13 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/app/firebase/firebaseConfig';
-import { addUser } from '../firebase/firestore';
-import { setSessionCookie, signInWithGoogle } from '@/app/firebase/auth';
+import { signInWithGoogle, signUpWithEmail } from '@/app/firebase/auth';
 import { AuthShell, Divider, GoogleMark, PasswordInput } from '../components/AuthShell';
 import { Alert, Button, Field, Input } from '../components/ui';
 import { authErrorMessage } from '@/lib/authErrors';
+import { USER_DAILY_SEARCH_LIMIT } from '@/lib/searchLimit';
 
 const SignUp: React.FC = () => {
     const router = useRouter();
@@ -34,17 +32,13 @@ const SignUp: React.FC = () => {
 
     const handleSignUp = (e: React.FormEvent) => {
         e.preventDefault();
-        run('email', async () => {
-            const { user } = await createUserWithEmailAndPassword(auth, email, password);
-            await addUser(user.uid, email);
-            setSessionCookie(user);
-        });
+        run('email', async () => { await signUpWithEmail(email, password); });
     };
 
     return (
         <AuthShell
             title="Create your account"
-            subtitle="Keep the spots you like and never see the ones you don't."
+            subtitle={`Get ${USER_DAILY_SEARCH_LIMIT} searches a day, keep the spots you like and never see the ones you don't.`}
             footer={<>Already have an account? <Link href="/sign-in" className="font-semibold text-white hover:underline">Sign in</Link></>}
         >
             <Button variant="outline" className="w-full" onClick={() => run('google', async () => { await signInWithGoogle(); })} loading={pending === 'google'} disabled={pending !== null}>
