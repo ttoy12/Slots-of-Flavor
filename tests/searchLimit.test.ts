@@ -8,6 +8,12 @@ describe('searchesRemaining', () => {
         expect(searchesRemaining({ total: 28, user: 0 })).toBe(2);
     });
 
+    it('gives guests one search', () => {
+        expect(searchesRemaining({ total: 0, user: 0 }, true)).toBe(1);
+        expect(searchesRemaining({ total: 0, user: 1 }, true)).toBe(0);
+        expect(searchesRemaining({ total: 30, user: 0 }, true)).toBe(0);
+    });
+
     it('never goes below zero', () => {
         expect(searchesRemaining({ total: 31, user: 7 })).toBe(0);
     });

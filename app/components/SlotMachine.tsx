@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import Link from 'next/link';
-import { AlertTriangle, Check, Clock, Dices, LogIn, MapPin, MapPinOff, Navigation, RotateCw, SearchX, Share2, Star, ThumbsDown, ThumbsUp, UtensilsCrossed, WifiOff, type LucideIcon } from 'lucide-react';
+import { AlertTriangle, Check, Clock, Dices, LogIn, MapPin, MapPinOff, Navigation, RotateCw, SearchX, Share2, Star, ThumbsDown, ThumbsUp, UserPlus, UtensilsCrossed, WifiOff, type LucideIcon } from 'lucide-react';
 import { auth } from '../firebase/firebaseConfig';
 import { addLikedPlace, addDislikedPlace, removedLikedPlace, removedDislikedPlace, formatAddress, Business } from '@/app/firebase/firestore';
 import { cn } from '@/lib/utils';
@@ -90,10 +90,11 @@ function Lights() {
     );
 }
 
-function ResultDetails({ business, likedPlaces, onDisliked }: {
+function ResultDetails({ business, likedPlaces, onDisliked, demo }: {
     business: Business;
     likedPlaces: Business[];
     onDisliked: (business: Business) => void;
+    demo?: boolean;
 }) {
     const [user] = useAuthState(auth);
     // This component is keyed by business id, so these reset on each spin.
@@ -148,22 +149,28 @@ function ResultDetails({ business, likedPlaces, onDisliked }: {
     };
 
     return (
-        <div className="grid gap-5 p-5 sm:grid-cols-[180px_1fr] sm:p-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-            <div className="relative aspect-video overflow-hidden rounded-2xl bg-secondary sm:aspect-square">
-                {business.image_url && !imageFailed ? (
-                    // eslint-disable-next-line @next/next/no-img-element -- served via our signed photo redirect
-                    <img src={business.image_url} alt="" className="absolute inset-0 h-full w-full object-cover" onError={() => setImageFailed(true)} />
-                ) : (
-                    <div className="flex h-full items-center justify-center text-muted-foreground">
-                        <UtensilsCrossed className="h-10 w-10" aria-hidden />
-                    </div>
-                )}
-            </div>
+        <div className={cn('grid gap-5 p-5 sm:p-6 animate-in fade-in slide-in-from-bottom-2 duration-500', !demo && 'sm:grid-cols-[180px_1fr]')}>
+            {!demo && (
+                <div className="relative aspect-video overflow-hidden rounded-2xl bg-secondary sm:aspect-square">
+                    {business.image_url && !imageFailed ? (
+                        // eslint-disable-next-line @next/next/no-img-element -- served via our signed photo redirect
+                        <img src={business.image_url} alt="" className="absolute inset-0 h-full w-full object-cover" onError={() => setImageFailed(true)} />
+                    ) : (
+                        <div className="flex h-full items-center justify-center text-muted-foreground">
+                            <UtensilsCrossed className="h-10 w-10" aria-hidden />
+                        </div>
+                    )}
+                </div>
+            )}
 
             <div className="flex min-w-0 flex-col">
-                <a href={business.url} target="_blank" rel="noreferrer noopener" className="w-fit hover:underline">
+                {demo ? (
                     <h2 className="text-2xl font-bold leading-tight sm:text-3xl">{business.name}</h2>
-                </a>
+                ) : (
+                    <a href={business.url} target="_blank" rel="noreferrer noopener" className="w-fit hover:underline">
+                        <h2 className="text-2xl font-bold leading-tight sm:text-3xl">{business.name}</h2>
+                    </a>
+                )}
 
                 <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                     {business.rating ? (
@@ -190,23 +197,29 @@ function ResultDetails({ business, likedPlaces, onDisliked }: {
                     </a>
                 )}
 
-                <div className="mt-auto flex flex-wrap gap-2 pt-5">
-                    <Button variant={liked ? 'primary' : 'outline'} size="sm" onClick={handleLiked} aria-pressed={liked}
-                        className={liked ? 'bg-success shadow-none hover:bg-success/90' : undefined}>
-                        <ThumbsUp className="h-4 w-4" aria-hidden /> {liked ? 'Liked' : 'Like'}
-                    </Button>
-                    <Button variant={disliked ? 'primary' : 'outline'} size="sm" onClick={handleDislike} aria-pressed={disliked}
-                        className={disliked ? 'bg-destructive shadow-none hover:bg-destructive/90' : undefined}>
-                        <ThumbsDown className="h-4 w-4" aria-hidden /> {disliked ? 'Disliked' : 'Dislike'}
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={handleShare}>
-                        {copied ? <Check className="h-4 w-4" aria-hidden /> : <Share2 className="h-4 w-4" aria-hidden />}
-                        {copied ? 'Link copied' : 'Share'}
-                    </Button>
-                    <a href={business.url} target="_blank" rel="noreferrer noopener" className={buttonClasses('outline', 'sm')}>
-                        <Navigation className="h-4 w-4" aria-hidden /> Directions
-                    </a>
-                </div>
+                {demo ? (
+                    <p className="mt-auto pt-5 text-sm text-muted-foreground">
+                        In the real app you can like it to save it, dislike it to never see it again, or get directions.
+                    </p>
+                ) : (
+                    <div className="mt-auto flex flex-wrap gap-2 pt-5">
+                        <Button variant={liked ? 'primary' : 'outline'} size="sm" onClick={handleLiked} aria-pressed={liked}
+                            className={liked ? 'bg-success shadow-none hover:bg-success/90' : undefined}>
+                            <ThumbsUp className="h-4 w-4" aria-hidden /> {liked ? 'Liked' : 'Like'}
+                        </Button>
+                        <Button variant={disliked ? 'primary' : 'outline'} size="sm" onClick={handleDislike} aria-pressed={disliked}
+                            className={disliked ? 'bg-destructive shadow-none hover:bg-destructive/90' : undefined}>
+                            <ThumbsDown className="h-4 w-4" aria-hidden /> {disliked ? 'Disliked' : 'Dislike'}
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={handleShare}>
+                            {copied ? <Check className="h-4 w-4" aria-hidden /> : <Share2 className="h-4 w-4" aria-hidden />}
+                            {copied ? 'Link copied' : 'Share'}
+                        </Button>
+                        <a href={business.url} target="_blank" rel="noreferrer noopener" className={buttonClasses('outline', 'sm')}>
+                            <Navigation className="h-4 w-4" aria-hidden /> Directions
+                        </a>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -236,12 +249,13 @@ function StatusPanel({ icon: Icon, title, hint, tone = 'muted', children }: {
 
 const ERROR_ICONS: Partial<Record<SearchError['code'], LucideIcon>> = {
     DAILY_LIMIT: Clock,
+    GUEST_LIMIT: UserPlus,
     LOCATION_NOT_FOUND: MapPinOff,
     NETWORK: WifiOff,
     UNAUTHENTICATED: LogIn,
 };
 
-export default function SlotMachine({ status, error, spin, likedPlaces, poolSize, canSpinAgain, onSpinAgain, onRetry, onDisliked }: {
+export default function SlotMachine({ status, error, spin, likedPlaces, poolSize, canSpinAgain, onSpinAgain, onRetry, onDisliked, demo }: {
     status: MachineStatus;
     error?: SearchError | null;
     spin: Spin | null;
@@ -252,6 +266,8 @@ export default function SlotMachine({ status, error, spin, likedPlaces, poolSize
     // Omitted when the caller shows its own retry button (the mobile sheet's bottom bar).
     onRetry?: () => void;
     onDisliked: (business: Business) => void;
+    // The welcome page's sample spin: no saving, sharing or outbound links.
+    demo?: boolean;
 }) {
     const [landedId, setLandedId] = useState<number | null>(null);
     const landed = spin !== null && landedId === spin.id;
@@ -284,9 +300,9 @@ export default function SlotMachine({ status, error, spin, likedPlaces, poolSize
 
             {status === 'result' && spin && landed ? (
                 <>
-                    <ResultDetails key={spin.business.id} business={spin.business} likedPlaces={likedPlaces} onDisliked={onDisliked} />
+                    <ResultDetails key={spin.business.id} business={spin.business} likedPlaces={likedPlaces} onDisliked={onDisliked} demo={demo} />
                     <div className="flex flex-col items-center gap-2 border-t border-border px-5 py-4 sm:flex-row sm:justify-between sm:px-6">
-                        <p className="text-xs text-muted-foreground">Restaurant data from Google Maps</p>
+                        <p className="text-xs text-muted-foreground">{demo ? 'Sample restaurants for the demo' : 'Restaurant data from Google Maps'}</p>
                         {canSpinAgain && (
                             <Button variant="secondary" size="sm" onClick={onSpinAgain}>
                                 <Dices className="h-4 w-4" aria-hidden /> Spin again
@@ -305,6 +321,9 @@ export default function SlotMachine({ status, error, spin, likedPlaces, poolSize
                         <Button variant="secondary" onClick={onSpinAgain}>
                             <Dices className="h-4 w-4" aria-hidden /> Spin last results
                         </Button>
+                    )}
+                    {error.code === 'GUEST_LIMIT' && (
+                        <Link href="/sign-up" className={buttonClasses('primary')}>Create a free account</Link>
                     )}
                     {error.code === 'UNAUTHENTICATED' && (
                         <Link href="/sign-in" className={buttonClasses('primary')}>Sign in again</Link>

@@ -1,8 +1,12 @@
-// Shared by the server route and the UI. Keep both limits in sync with the
+// Shared by the server route and the UI. Keep these limits in sync with the
 // caps in firestore.rules (usage/{day} and usage/{day}/users/{uid}), and keep
 // DAILY_SEARCH_LIMIT within the Google Cloud quota.
 export const DAILY_SEARCH_LIMIT = 30;
 export const USER_DAILY_SEARCH_LIMIT = 5;
+// Guests (anonymous Firebase users) get a taste before signing up.
+export const GUEST_DAILY_SEARCH_LIMIT = 1;
+
+export const userSearchLimit = (isGuest: boolean) => (isGuest ? GUEST_DAILY_SEARCH_LIMIT : USER_DAILY_SEARCH_LIMIT);
 
 // Google's per-day quotas reset at midnight Pacific, so the app's counter does too.
 const TIME_ZONE = 'America/Los_Angeles';
@@ -10,15 +14,15 @@ const TIME_ZONE = 'America/Los_Angeles';
 export const usageDayKey = (date = new Date()) =>
     new Intl.DateTimeFormat('en-CA', { timeZone: TIME_ZONE, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
 
-// Searches used today: by everyone, and by the signed-in user.
+// Searches used today: by everyone, and by the signed-in user (or guest).
 export interface SearchUsage {
     total: number;
     user: number;
 }
 
 // Whichever limit runs out first decides how many searches are left.
-export const searchesRemaining = ({ total, user }: SearchUsage) =>
-    Math.max(Math.min(DAILY_SEARCH_LIMIT - total, USER_DAILY_SEARCH_LIMIT - user), 0);
+export const searchesRemaining = ({ total, user }: SearchUsage, isGuest = false) =>
+    Math.max(Math.min(DAILY_SEARCH_LIMIT - total, userSearchLimit(isGuest) - user), 0);
 
 export function timeUntilReset(date = new Date()): string {
     const parts = Object.fromEntries(
@@ -34,7 +38,7 @@ export function timeUntilReset(date = new Date()): string {
 
 // Error shape returned by /api/places and shown in the slot machine.
 export interface SearchError {
-    code: 'UNAUTHENTICATED' | 'BAD_REQUEST' | 'LOCATION_NOT_FOUND' | 'DAILY_LIMIT' | 'CONFIG' | 'UPSTREAM' | 'NETWORK';
+    code: 'UNAUTHENTICATED' | 'BAD_REQUEST' | 'LOCATION_NOT_FOUND' | 'DAILY_LIMIT' | 'GUEST_LIMIT' | 'CONFIG' | 'UPSTREAM' | 'NETWORK';
     title: string;
     hint: string;
     retryable: boolean;

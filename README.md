@@ -18,9 +18,10 @@ Slots of Flavor picks a random restaurant for you. Tell it where you are, what y
 - **Filters.** Location (with city autocomplete), craving, distance (1–25 miles) and price ($–$$$$). Only places open right now are shown.
 - **Like or dislike.** Liked places are saved to My spots. Disliked places never come up in your spins again (you can move them back any time).
 - **Built for phones.** On mobile the result opens in a full-screen sheet, so the reel is always in view.
-- **Daily search limit.** Each user gets 5 searches a day, with a cap of 30 a day across all users, and the app shows how many are left. Both reset at midnight Pacific.
+- **Try before signing up.** "Try it free" on the welcome page starts a guest session (Firebase anonymous sign-in) with 1 search. Signing up afterwards upgrades the guest account in place, so anything they liked carries over.
+- **Daily search limit.** Each user gets 5 searches a day (guests get 1), with a cap of 30 a day across everyone, and the app shows how many are left. Both reset at midnight Pacific.
 - **Helpful errors.** If a search fails, the app says why (location not found, Google not responding, offline, out of searches) and offers to try again when that would help.
-- **Accounts.** Email/password or Google sign-in with Firebase Authentication. Users can delete their account and all saved data from My spots.
+- **Accounts.** Email/password or Google sign-in with Firebase Authentication, plus guest sessions. Users can delete their account and all saved data from My spots.
 - **Terms of Service and Privacy Policy** pages, linked across the site.
 
 ## Tech stack
@@ -35,7 +36,7 @@ Slots of Flavor picks a random restaurant for you. Tell it where you are, what y
 
 - **Search:** `app/api/places/route.ts` runs a Google Places Text Search for open restaurants. When a distance is chosen, it geocodes the location and keeps only results within that radius.
 - **Security:** the search route only accepts requests with a valid Firebase sign-in token. Place photos are served through `app/api/places/photo/route.ts` with signed URLs, so the Google API key never reaches the browser.
-- **Search limit:** Firestore keeps two counters per day: `usage/YYYY-MM-DD` for all searches and `usage/YYYY-MM-DD/users/{uid}` for each user. The server checks both before calling Google. Firestore rules only let a count go up by one (never past 30 total or 5 per user), and the total can only go up in the same write as the caller's own count, so no one can use up other people's searches.
+- **Search limit:** Firestore keeps two counters per day: `usage/YYYY-MM-DD` for all searches and `usage/YYYY-MM-DD/users/{uid}` for each user. The server checks both before calling Google. Firestore rules only let a count go up by one (never past 30 total, or 5 per user and 1 per guest), and the total can only go up in the same write as the caller's own count, so no one can use up other people's searches.
 - **Saved places:** stored at `users/{uid}/liked/{placeId}` and `users/{uid}/disliked/{placeId}`.
 
 ## Running it locally
@@ -70,7 +71,7 @@ Slots of Flavor picks a random restaurant for you. Tell it where you are, what y
    - Google includes a free monthly allowance per API. Searches use the Text Search Enterprise tier (because of the rating and price fields), and each photo shown is a Place Photos request. To stay free, set daily quotas (for example 30 Text Search, 30 photo and 50 geocoding requests) and a budget alert.
 
 4. Set up Firebase:
-   - Enable **Email/Password** and **Google** sign-in under Authentication.
+   - Enable **Email/Password**, **Google** and **Anonymous** sign-in under Authentication. Anonymous is what lets visitors try a search without an account; without it, "Try it free" sends them to sign-up.
    - In **Firestore Database → Rules**, paste in the contents of `firestore.rules` and publish.
    - When deploying, add your site's domain under **Authentication → Settings → Authorized domains**.
 
@@ -93,7 +94,7 @@ Run `npm run test:rules` after any change to `firestore.rules`, then publish the
 
 ## Configuration
 
-- **Daily search limits:** `USER_DAILY_SEARCH_LIMIT` (per user) and `DAILY_SEARCH_LIMIT` (all users) in `lib/searchLimit.ts`. Change the matching `5` and `30` in `firestore.rules` too, and keep the total within your Google Cloud quota.
+- **Daily search limits:** `USER_DAILY_SEARCH_LIMIT` (per user), `GUEST_DAILY_SEARCH_LIMIT` (per guest) and `DAILY_SEARCH_LIMIT` (everyone) in `lib/searchLimit.ts`. Change the matching `5`, `1` and `30` in `firestore.rules` too, and keep the total within your Google Cloud quota.
 - **Contact email for the legal pages:** `CONTACT_EMAIL` in `lib/legal.ts`.
 - **Colors and fonts:** theme tokens in `app/globals.css`.
 

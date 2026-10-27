@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 import Link from 'next/link';
-import { Dices, MapPin, Navigation, Star, ThumbsDown, ThumbsUp, Trash2, UtensilsCrossed } from 'lucide-react';
+import { Dices, MapPin, Navigation, Star, ThumbsDown, ThumbsUp, Trash2, UserPlus, UtensilsCrossed } from 'lucide-react';
 import type { User } from 'firebase/auth';
 import AuthWrapper from '../components/AuthWrapper';
 import DeleteAccount from '../components/DeleteAccount';
@@ -9,6 +9,7 @@ import { buttonClasses, Card, Spinner } from '../components/ui';
 import useFetchLikedAndDislikedPlaces from '../hooks/useFetchLikedAndDislikedPlaces';
 import { addDislikedPlace, addLikedPlace, Business, formatAddress, removedDislikedPlace, removedLikedPlace } from '../firebase/firestore';
 import { cn } from '@/lib/utils';
+import { USER_DAILY_SEARCH_LIMIT } from '@/lib/searchLimit';
 
 type Tab = 'liked' | 'disliked';
 
@@ -84,6 +85,23 @@ function PlaceCard({ place, tab, userID, onUpdate }: { place: Business; tab: Tab
     );
 }
 
+// Guests have no account to delete; their spots carry over when they sign up.
+function GuestSignUpPrompt() {
+    return (
+        <Card className="mt-12 flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+            <div>
+                <h2 className="text-lg font-bold">You&rsquo;re spinning as a guest</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                    Create a free account to keep these spots and get {USER_DAILY_SEARCH_LIMIT} searches a day.
+                </p>
+            </div>
+            <Link href="/sign-up" className={buttonClasses('primary', 'md', 'shrink-0')}>
+                <UserPlus className="h-4 w-4" aria-hidden /> Create account
+            </Link>
+        </Card>
+    );
+}
+
 function MyPlaces({ user }: { user: User }) {
     const userID = user.uid;
     const [tab, setTab] = useState<Tab>('liked');
@@ -144,7 +162,9 @@ function MyPlaces({ user }: { user: User }) {
                 </div>
             )}
 
-            {!loading && <DeleteAccount user={user} likedCount={likedPlaces.length} dislikedCount={dislikedPlaces.length} />}
+            {!loading && (user.isAnonymous
+                ? <GuestSignUpPrompt />
+                : <DeleteAccount user={user} likedCount={likedPlaces.length} dislikedCount={dislikedPlaces.length} />)}
         </>
     );
 }
@@ -155,7 +175,7 @@ export default function Profile() {
             {(user) => (
                 <div className="pt-4">
                     <div className="mb-6 text-white">
-                        <p className="text-sm text-white/70">{user.email}</p>
+                        <p className="text-sm text-white/70">{user.email ?? 'Guest'}</p>
                         <h1 className="mt-1 text-4xl font-extrabold sm:text-5xl">Your spots</h1>
                     </div>
                     <MyPlaces user={user} />
