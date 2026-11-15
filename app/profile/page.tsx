@@ -1,17 +1,19 @@
 "use client";
 import { useState } from 'react';
 import Link from 'next/link';
-import { Dices, MapPin, Navigation, Star, ThumbsDown, ThumbsUp, Trash2, UserPlus, UtensilsCrossed } from 'lucide-react';
+import { CalendarCheck, Dices, MapPin, Navigation, Star, ThumbsDown, ThumbsUp, Trash2, UserPlus, UtensilsCrossed } from 'lucide-react';
 import type { User } from 'firebase/auth';
 import AuthWrapper from '../components/AuthWrapper';
 import DeleteAccount from '../components/DeleteAccount';
 import { buttonClasses, Card, Spinner } from '../components/ui';
 import useFetchLikedAndDislikedPlaces from '../hooks/useFetchLikedAndDislikedPlaces';
-import { addDislikedPlace, addLikedPlace, Business, formatAddress, removedDislikedPlace, removedLikedPlace } from '../firebase/firestore';
+import { addDislikedPlace, addLikedPlace, Business, formatAddress, removedDislikedPlace, removedLikedPlace, removedVisitedPlace } from '../firebase/firestore';
 import { cn } from '@/lib/utils';
 import { USER_DAILY_SEARCH_LIMIT } from '@/lib/searchLimit';
 
-type Tab = 'liked' | 'disliked';
+type Tab = 'liked' | 'visited' | 'disliked';
+
+const REMOVE = { liked: removedLikedPlace, visited: removedVisitedPlace, disliked: removedDislikedPlace };
 
 function PlaceCard({ place, tab, userID, onUpdate }: { place: Business; tab: Tab; userID: string; onUpdate: () => void }) {
     const [busy, setBusy] = useState(false);
@@ -27,7 +29,7 @@ function PlaceCard({ place, tab, userID, onUpdate }: { place: Business; tab: Tab
         }
     };
 
-    const remove = () => act(() => (tab === 'liked' ? removedLikedPlace : removedDislikedPlace)(userID, place));
+    const remove = () => act(() => REMOVE[tab](userID, place));
     const move = () => act(async () => {
         if (tab === 'liked') {
             await addDislikedPlace(userID, place);
@@ -68,14 +70,22 @@ function PlaceCard({ place, tab, userID, onUpdate }: { place: Business; tab: Tab
                     <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
                     <span className="line-clamp-2">{formatAddress(place)}</span>
                 </p>
+                {tab === 'visited' && place.visitedAt && (
+                    <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
+                        <CalendarCheck className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                        Visited {new Date(place.visitedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
+                )}
                 <div className="mt-auto flex items-center gap-1 pt-4">
                     <a href={place.url} target="_blank" rel="noreferrer noopener" className={buttonClasses('outline', 'sm', 'mr-auto')}>
                         <Navigation className="h-4 w-4" aria-hidden /> Open
                     </a>
-                    <button onClick={move} disabled={busy} className={iconButton}
-                        title={tab === 'liked' ? 'Move to Disliked' : 'Move to Liked'} aria-label={tab === 'liked' ? 'Move to Disliked' : 'Move to Liked'}>
-                        {tab === 'liked' ? <ThumbsDown className="h-4 w-4" /> : <ThumbsUp className="h-4 w-4" />}
-                    </button>
+                    {tab !== 'visited' && (
+                        <button onClick={move} disabled={busy} className={iconButton}
+                            title={tab === 'liked' ? 'Move to Disliked' : 'Move to Liked'} aria-label={tab === 'liked' ? 'Move to Disliked' : 'Move to Liked'}>
+                            {tab === 'liked' ? <ThumbsDown className="h-4 w-4" /> : <ThumbsUp className="h-4 w-4" />}
+                        </button>
+                    )}
                     <button onClick={remove} disabled={busy} className={cn(iconButton, 'hover:text-destructive')} title="Remove" aria-label="Remove">
                         <Trash2 className="h-4 w-4" />
                     </button>
@@ -105,17 +115,18 @@ function GuestSignUpPrompt() {
 function MyPlaces({ user }: { user: User }) {
     const userID = user.uid;
     const [tab, setTab] = useState<Tab>('liked');
-    const { likedPlaces, dislikedPlaces, loading, handleUpdate } = useFetchLikedAndDislikedPlaces(userID);
-    const places = tab === 'liked' ? likedPlaces : dislikedPlaces;
+    const { likedPlaces, dislikedPlaces, visitedPlaces, loading, handleUpdate } = useFetchLikedAndDislikedPlaces(userID);
+    const places = { liked: likedPlaces, visited: visitedPlaces, disliked: dislikedPlaces }[tab];
 
     const tabs: { id: Tab; label: string; count: number }[] = [
         { id: 'liked', label: 'Liked', count: likedPlaces.length },
+        { id: 'visited', label: 'Visited', count: visitedPlaces.length },
         { id: 'disliked', label: 'Disliked', count: dislikedPlaces.length },
     ];
 
     return (
         <>
-            <div role="tablist" aria-label="Liked and disliked places" className="mb-6 inline-flex rounded-full border border-white/15 bg-white/10 p-1 backdrop-blur-sm">
+            <div role="tablist" aria-label="Your saved places" className="mb-6 inline-flex max-w-full rounded-full border border-white/15 bg-white/10 p-1 backdrop-blur-sm">
                 {tabs.map(({ id, label, count }) => (
                     <button
                         key={id}
@@ -123,7 +134,7 @@ function MyPlaces({ user }: { user: User }) {
                         aria-selected={tab === id}
                         onClick={() => setTab(id)}
                         className={cn(
-                            'flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors',
+                            'flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold transition-colors sm:px-4',
                             tab === id ? 'bg-white text-foreground' : 'text-white/80 hover:text-white'
                         )}
                     >
@@ -139,16 +150,24 @@ function MyPlaces({ user }: { user: User }) {
                 </p>
             )}
 
+            {tab === 'visited' && visitedPlaces.length > 0 && (
+                <p className="-mt-3 mb-5 text-sm text-white/75">
+                    {visitedPlaces.length === 1 ? 'One place tried so far.' : `${visitedPlaces.length} places tried so far.`} Removing one here doesn&rsquo;t change your likes.
+                </p>
+            )}
+
             {loading ? (
                 <div className="flex justify-center py-20"><Spinner className="h-8 w-8" /></div>
             ) : places.length === 0 ? (
                 <Card className="mx-auto max-w-md p-8 text-center">
                     <UtensilsCrossed className="mx-auto h-10 w-10 text-muted-foreground" aria-hidden />
-                    <h2 className="mt-4 text-xl font-bold">{tab === 'liked' ? 'No liked spots yet' : 'No disliked spots yet'}</h2>
+                    <h2 className="mt-4 text-xl font-bold">{{ liked: 'No liked spots yet', visited: 'No visits logged yet', disliked: 'No disliked spots yet' }[tab]}</h2>
                     <p className="mt-1 text-sm text-muted-foreground">
-                        {tab === 'liked'
-                            ? 'Tap Like on a spin you enjoy and it lands here.'
-                            : 'Places you dislike show up here and won’t come up in your spins.'}
+                        {{
+                            liked: 'Tap Like on a spin you enjoy and it lands here.',
+                            visited: 'After a spin, the app asks next time whether you went. Say yes and the place lands here.',
+                            disliked: 'Places you dislike show up here and won’t come up in your spins.',
+                        }[tab]}
                     </p>
                     <Link href="/" className={buttonClasses('primary', 'md', 'mt-6')}>
                         <Dices className="h-4 w-4" aria-hidden /> Go spin
@@ -164,7 +183,7 @@ function MyPlaces({ user }: { user: User }) {
 
             {!loading && (user.isAnonymous
                 ? <GuestSignUpPrompt />
-                : <DeleteAccount user={user} likedCount={likedPlaces.length} dislikedCount={dislikedPlaces.length} />)}
+                : <DeleteAccount user={user} likedCount={likedPlaces.length} dislikedCount={dislikedPlaces.length} visitedCount={visitedPlaces.length} />)}
         </>
     );
 }

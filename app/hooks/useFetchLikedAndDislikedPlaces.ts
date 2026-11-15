@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { getLikedPlaces, getDislikedPlaces, Business } from '../firebase/firestore';
+import { getLikedPlaces, getDislikedPlaces, getVisitedPlaces, Business } from '../firebase/firestore';
 
 const useFetchLikedAndDislikedPlaces = (userID?: string | null) => {
     const [likedPlaces, setLikedPlaces] = useState<Business[]>([]);
     const [dislikedPlaces, setDislikedPlaces] = useState<Business[]>([]);
+    const [visitedPlaces, setVisitedPlaces] = useState<Business[]>([]);
     const [loadedFor, setLoadedFor] = useState<string | null>(null);
     const [shouldUpdate, setShouldUpdate] = useState<boolean>(false);
 
@@ -14,6 +15,7 @@ const useFetchLikedAndDislikedPlaces = (userID?: string | null) => {
         const fetchPlaces = async () => {
             setLikedPlaces(await getLikedPlaces(userID));
             setDislikedPlaces(await getDislikedPlaces(userID));
+            setVisitedPlaces(await getVisitedPlaces(userID));
             setLoadedFor(userID);
         };
 
@@ -27,6 +29,7 @@ const useFetchLikedAndDislikedPlaces = (userID?: string | null) => {
     return {
         likedPlaces: userID ? likedPlaces : [],
         dislikedPlaces: userID ? dislikedPlaces : [],
+        visitedPlaces: userID ? visitedPlaces : [],
         loading: !!userID && loadedFor !== userID,
         handleUpdate,
     };

@@ -8,10 +8,11 @@ import { authErrorMessage } from '@/lib/authErrors';
 import { PasswordInput, GoogleMark } from './AuthShell';
 import { Alert, Button, Card, Field } from './ui';
 
-export default function DeleteAccount({ user, likedCount, dislikedCount }: {
+export default function DeleteAccount({ user, likedCount, dislikedCount, visitedCount }: {
     user: User;
     likedCount: number;
     dislikedCount: number;
+    visitedCount: number;
 }) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
@@ -86,7 +87,7 @@ export default function DeleteAccount({ user, likedCount, dislikedCount }: {
                             <p>This permanently deletes:</p>
                             <ul className="list-disc space-y-1 pl-5">
                                 <li>your account ({user.email})</li>
-                                <li>{likedCount} liked and {dislikedCount} disliked {likedCount + dislikedCount === 1 ? 'place' : 'places'}</li>
+                                <li>{likedCount} liked, {visitedCount} visited and {dislikedCount} disliked {likedCount + visitedCount + dislikedCount === 1 ? 'place' : 'places'}</li>
                             </ul>
                             <p>You can&rsquo;t undo this. You&rsquo;re welcome to sign up again later.</p>
                         </div>

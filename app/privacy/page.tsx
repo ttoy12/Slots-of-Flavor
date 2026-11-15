@@ -29,6 +29,10 @@ export default function Privacy() {
                         name, address, rating, price level, Google Maps link and photo link, along with when you saved it.
                     </li>
                     <li>
+                        <strong>Places you visited.</strong> When you tell the app you went to a restaurant it picked, we save
+                        the same restaurant details and the date you confirmed the visit.
+                    </li>
+                    <li>
                         <strong>Searches.</strong> The location, craving, distance and price you search with are sent to our
                         server and to Google to find restaurants. We don&rsquo;t keep a history of your searches.
                     </li>
@@ -47,7 +51,9 @@ export default function Privacy() {
                     <li>
                         <strong>Cookies and browser storage.</strong> We set a cookie named <code>user</code> containing your
                         email address so the app remembers you&rsquo;re signed in. It expires after 7 days or when you sign
-                        out. Firebase also keeps your sign-in session in your browser&rsquo;s storage.
+                        out. Firebase also keeps your sign-in session in your browser&rsquo;s storage. Your most recent
+                        spin is kept in your browser&rsquo;s storage for up to 14 days so the app can ask whether you went;
+                        it isn&rsquo;t sent to us unless you answer yes.
                     </li>
                 </List>
                 <p>
@@ -59,7 +65,7 @@ export default function Privacy() {
             <Section title="How we use it">
                 <List>
                     <li>To sign you in and keep your account secure.</li>
-                    <li>To find restaurants for your searches and show you your liked and disliked places.</li>
+                    <li>To find restaurants for your searches and show you your liked, visited and disliked places.</li>
                     <li>To keep disliked places out of your future spins.</li>
                     <li>To limit how many searches the app makes each day.</li>
                 </List>
@@ -94,7 +100,7 @@ export default function Privacy() {
 
             <Section title="Your choices">
                 <List>
-                    <li>You can remove any liked or disliked place at any time from the My spots page.</li>
+                    <li>You can remove any liked, visited or disliked place at any time from the My spots page.</li>
                     <li>
                         Sharing your location is optional. You can always search by city instead, and you can withdraw the
                         permission at any time in your browser&rsquo;s site settings.
