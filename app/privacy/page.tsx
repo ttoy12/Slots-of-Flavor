@@ -33,6 +33,14 @@ export default function Privacy() {
                         server and to Google to find restaurants. We don&rsquo;t keep a history of your searches.
                     </li>
                     <li>
+                        <strong>Your current location, if you choose to share it.</strong> Searching by city never uses your
+                        device&rsquo;s location. If you tap &ldquo;Use my current location&rdquo;, your browser asks for your
+                        permission and then gives the app your device&rsquo;s coordinates, which we round to roughly a city
+                        block. They are sent to our server and to Google with that search, in place of a city, to find
+                        restaurants near you. We don&rsquo;t save them to your account or our database, and the app forgets
+                        them when you close or reload the page.
+                    </li>
+                    <li>
                         <strong>A daily search count.</strong> We count the total number of searches made in the app each day
                         to enforce a daily limit. This count is shared across all users and isn&rsquo;t linked to you.
                     </li>
@@ -43,8 +51,8 @@ export default function Privacy() {
                     </li>
                 </List>
                 <p>
-                    We don&rsquo;t use advertising, analytics or tracking tools, and we don&rsquo;t ask for your device&rsquo;s
-                    precise location.
+                    We don&rsquo;t use advertising, analytics or tracking tools, and we never read your device&rsquo;s
+                    location unless you tap &ldquo;Use my current location&rdquo;.
                 </p>
             </Section>
 
@@ -70,7 +78,8 @@ export default function Privacy() {
                     </li>
                     <li>
                         <strong>Vercel</strong> hosts the app. Like most hosts, it may keep standard server logs, such as your
-                        IP address and browser type, for security and troubleshooting.
+                        IP address, browser type and the address of each request, for security and troubleshooting. A
+                        search request includes the city or coordinates you searched with.
                     </li>
                 </List>
                 <p>We may also share information if the law requires it.</p>
@@ -86,6 +95,10 @@ export default function Privacy() {
             <Section title="Your choices">
                 <List>
                     <li>You can remove any liked or disliked place at any time from the My spots page.</li>
+                    <li>
+                        Sharing your location is optional. You can always search by city instead, and you can withdraw the
+                        permission at any time in your browser&rsquo;s site settings.
+                    </li>
                     <li>
                         You can delete your account and everything saved with it at any time with the Delete my account
                         button at the bottom of the My spots page. Deletion is immediate and permanent.

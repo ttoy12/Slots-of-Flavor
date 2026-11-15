@@ -7,7 +7,7 @@ import useFetchLikedAndDislikedPlaces from './hooks/useFetchLikedAndDislikedPlac
 import { Business, getSearchesRemaining } from './firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from './firebase/firebaseConfig';
-import LocationAutocomplete from './components/LocationAutocomplete';
+import LocationAutocomplete, { Coordinates } from './components/LocationAutocomplete';
 import SlotMachine, { MachineStatus, Spin } from './components/SlotMachine';
 import { buildSpin, pickRandom } from '@/lib/spin';
 import { Button, buttonClasses, Card, Chip, Field, Input } from './components/ui';
@@ -44,6 +44,8 @@ const unknownError = (): SearchError => ({
 export default function Home() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [location, setLocation] = useState<string>("");
+  // Set while the user is searching from their device's location instead of a city.
+  const [coords, setCoords] = useState<Coordinates | null>(null);
   const [distance, setDistance] = useState<string>("");
   const [term, setTerm] = useState<string>("");
   const [price, setPrice] = useState<string[]>([]);
@@ -82,13 +84,17 @@ export default function Home() {
     getSearchesRemaining(user.uid, user.isAnonymous).then(setRemaining);
   }, [user]);
 
-  const getBusinessList = async (location: string) => {
+  const hasWhere = !!coords || !!location.trim();
+
+  const getBusinessList = async () => {
     if (!user) {
       setError({ code: 'UNAUTHENTICATED', title: 'Your session has expired', hint: 'Sign in again to keep searching.', retryable: false });
       setStatus('error');
       return;
     }
-    const params = new URLSearchParams({ location });
+    const params = new URLSearchParams(
+      coords ? { lat: String(coords.latitude), lng: String(coords.longitude) } : { location: location.trim() }
+    );
     if (term.trim()) params.set('term', term.trim());
     if (price.length) params.set('price', price.join(','));
     if (distance) params.set('distance', distance);
@@ -129,9 +135,9 @@ export default function Home() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (location.trim() && !outOfSearches) {
+    if (hasWhere && !outOfSearches) {
       setSheetOpen(true);
-      getBusinessList(location.trim());
+      getBusinessList();
     }
   };
 
@@ -149,7 +155,7 @@ export default function Home() {
   const canSpinAgain = status === 'error' ? businesses.length > 0 : businesses.some(b => b.id !== spin?.business.id);
   const canRetry = status === 'error' && !!error?.retryable;
   const handleRetry = () => {
-    if (location.trim()) getBusinessList(location.trim());
+    if (hasWhere) getBusinessList();
   };
 
   // Disliked places drop out of this search's pool so "Spin again" skips them.
@@ -176,7 +182,7 @@ export default function Home() {
             <Card className="p-5 sm:p-6">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <Field label="Where" htmlFor="location">
-                  <LocationAutocomplete id="location" location={location} setLocation={setLocation} />
+                  <LocationAutocomplete id="location" location={location} setLocation={setLocation} coords={coords} setCoords={setCoords} />
                 </Field>
 
                 <Field label="Craving" htmlFor="term">

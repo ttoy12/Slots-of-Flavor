@@ -38,6 +38,10 @@ const PRICE_SYMBOLS: Record<string, string> = {
 
 const MAX_DISTANCE_METERS = 50000;
 
+// With "Any" distance there is no radius to restrict to, so searches from the
+// user's coordinates lean towards places within this many meters instead.
+const NEARBY_BIAS_METERS = 10000;
+
 interface LatLng {
     latitude: number;
     longitude: number;
@@ -125,6 +129,23 @@ async function placesFailure(res: Response): Promise<SearchFailure> {
     return upstreamFailure();
 }
 
+// The user's own coordinates, sent instead of a city when they choose
+// "Use my current location".
+function parseCoordinates(params: URLSearchParams): LatLng | null {
+    const lat = params.get("lat");
+    const lng = params.get("lng");
+    if (lat === null && lng === null) return null;
+
+    const latitude = Number(lat);
+    const longitude = Number(lng);
+    if (!lat || !lng || !Number.isFinite(latitude) || !Number.isFinite(longitude) ||
+        Math.abs(latitude) > 90 || Math.abs(longitude) > 180) {
+        throw fail(400, "BAD_REQUEST", "We couldn't read your location",
+            "Try \"Use my current location\" again, or enter a city instead.");
+    }
+    return { latitude, longitude };
+}
+
 function distanceMeters(a: LatLng, b: LatLng): number {
     const toRad = (deg: number) => (deg * Math.PI) / 180;
     const dLat = toRad(b.latitude - a.latitude);
@@ -191,8 +212,10 @@ async function search(req: Request) {
     const price = url.searchParams.get("price");
     const distance = Math.min(Number(url.searchParams.get("distance")) || 0, MAX_DISTANCE_METERS);
 
-    if (!location) {
-        throw fail(400, "BAD_REQUEST", "Where are you eating?", "Enter a city to search.");
+    const coordinates = parseCoordinates(url.searchParams);
+
+    if (!location && !coordinates) {
+        throw fail(400, "BAD_REQUEST", "Where are you eating?", "Enter a city or use your current location to search.");
     }
 
     // The daily counters. If they can't be read, fail open: the Google Cloud
@@ -202,7 +225,7 @@ async function search(req: Request) {
     if (used && used.total >= DAILY_SEARCH_LIMIT) throw dailyLimitFailure();
 
     const body: Record<string, unknown> = {
-        textQuery: `${term} in ${location}`,
+        textQuery: coordinates ? term : `${term} in ${location}`,
         openNow: true,
         pageSize: 20,
     };
@@ -216,9 +239,11 @@ async function search(req: Request) {
 
     let center: LatLng | null = null;
     if (distance) {
-        center = await geocode(location);
+        center = coordinates ?? await geocode(location!);
         body.textQuery = term;
         body.locationRestriction = { rectangle: boundingBox(center, distance) };
+    } else if (coordinates) {
+        body.locationBias = { circle: { center: coordinates, radius: NEARBY_BIAS_METERS } };
     }
 
     const res = await googleFetch("https://places.googleapis.com/v1/places:searchText", {
