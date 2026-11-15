@@ -15,7 +15,7 @@ Slots of Flavor picks a random restaurant for you. Tell it where you are, what y
 ## Features
 
 - **Slot-machine picks.** The reel spins through real nearby restaurants before landing on your pick. "Spin again" re-rolls from the same results without using another search.
-- **Filters.** Location (with city autocomplete), craving, distance (1–25 miles) and price ($–$$$$). Only places open right now are shown.
+- **Filters.** Location (city autocomplete or your current location), craving, distance (1–25 miles) and price ($–$$$$). Only places open right now are shown.
 - **Like or dislike.** Liked places are saved to My spots. Disliked places never come up in your spins again (you can move them back any time).
 - **Built for phones.** On mobile the result opens in a full-screen sheet, so the reel is always in view.
 - **Try before signing up.** "Try it free" on the welcome page starts a guest session (Firebase anonymous sign-in) with 1 search. Signing up afterwards upgrades the guest account in place, so anything they liked carries over.
@@ -34,7 +34,7 @@ Slots of Flavor picks a random restaurant for you. Tell it where you are, what y
 
 ## How it works
 
-- **Search:** `app/api/places/route.ts` runs a Google Places Text Search for open restaurants. When a distance is chosen, it geocodes the location and keeps only results within that radius.
+- **Search:** `app/api/places/route.ts` runs a Google Places Text Search for open restaurants. When a distance is chosen, it geocodes the city (or uses the coordinates from "Use my current location") and keeps only results within that radius.
 - **Security:** the search route only accepts requests with a valid Firebase sign-in token. Place photos are served through `app/api/places/photo/route.ts` with signed URLs, so the Google API key never reaches the browser.
 - **Search limit:** Firestore keeps two counters per day: `usage/YYYY-MM-DD` for all searches and `usage/YYYY-MM-DD/users/{uid}` for each user. The server checks both before calling Google. Firestore rules only let a count go up by one (never past 30 total, or 5 per user and 1 per guest), and the total can only go up in the same write as the caller's own count, so no one can use up other people's searches.
 - **Saved places:** stored at `users/{uid}/liked/{placeId}` and `users/{uid}/disliked/{placeId}`.
