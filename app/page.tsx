@@ -1,14 +1,16 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Dices, History, RotateCw, SlidersHorizontal, UserPlus, X } from 'lucide-react';
+import { Dices, Heart, History, RotateCw, SlidersHorizontal, UserPlus, X } from 'lucide-react';
 import AuthWrapper from './components/AuthWrapper';
 import useFetchLikedAndDislikedPlaces from './hooks/useFetchLikedAndDislikedPlaces';
-import { Business, getSearchesRemaining } from './firebase/firestore';
+import { Business, getLikedPlaces, getSearchesRemaining } from './firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from './firebase/firebaseConfig';
 import LocationAutocomplete, { Coordinates } from './components/LocationAutocomplete';
-import SlotMachine, { MachineStatus, Spin } from './components/SlotMachine';
+import SlotMachine, { MachineStatus, Spin, SpinSource } from './components/SlotMachine';
+import VisitPrompt from './components/VisitPrompt';
+import { saveLastPick } from '@/lib/lastPick';
 import { buildSpin, pickRandom } from '@/lib/spin';
 import { Button, buttonClasses, Card, Chip, Field, Input } from './components/ui';
 import useIsMobile from './hooks/useIsMobile';
@@ -51,6 +53,11 @@ export default function Home() {
   const [price, setPrice] = useState<string[]>([]);
   const [spin, setSpin] = useState<Spin | null>(null);
   const [status, setStatus] = useState<MachineStatus>('idle');
+  // `action` is what the machine was last asked to do; `poolSource` is where the
+  // places in `businesses` came from. They differ when a request fails and the
+  // earlier results are kept for "Spin again".
+  const [action, setAction] = useState<SpinSource>('search');
+  const [poolSource, setPoolSource] = useState<SpinSource>('search');
   const [error, setError] = useState<SearchError | null>(null);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -86,6 +93,13 @@ export default function Home() {
 
   const hasWhere = !!coords || !!location.trim();
 
+  // Lands the reel on `pick` and remembers it so the app can ask "Did you go?" later.
+  const showSpin = (pool: Business[], pick: Business) => {
+    setSpin(buildSpin(pool, pick));
+    setStatus('result');
+    if (user) saveLastPick(user.uid, pick);
+  };
+
   const getBusinessList = async () => {
     if (!user) {
       setError({ code: 'UNAUTHENTICATED', title: 'Your session has expired', hint: 'Sign in again to keep searching.', retryable: false });
@@ -99,6 +113,7 @@ export default function Home() {
     if (price.length) params.set('price', price.join(','));
     if (distance) params.set('distance', distance);
 
+    setAction('search');
     setStatus('loading');
     setError(null);
 
@@ -128,9 +143,44 @@ export default function Home() {
     if (typeof data.remaining === 'number') setRemaining(data.remaining);
     const filteredData = (data.places as Business[]).filter(business => !dislikedPlaces.some(disliked => disliked.id === business.id));
     setBusinesses(filteredData);
+    setPoolSource('search');
     const pick = pickRandom(filteredData);
-    setSpin(pick ? buildSpin(filteredData, pick) : null);
-    setStatus(pick ? 'result' : 'empty');
+    if (pick) {
+      showSpin(filteredData, pick);
+    } else {
+      setSpin(null);
+      setStatus('empty');
+    }
+  };
+
+  // Spins from the user's liked spots. No Google call, so it doesn't use a search.
+  const spinLikedSpots = async () => {
+    if (!user) return;
+    setSheetOpen(true);
+    setAction('liked');
+    setStatus('loading');
+    setError(null);
+
+    let liked: Business[];
+    try {
+      // Read fresh so places liked earlier in this session are included.
+      liked = await getLikedPlaces(user.uid);
+    } catch (err) {
+      console.error(err);
+      setError({ ...networkError(), title: 'Couldn’t load your liked spots' });
+      setStatus('error');
+      return;
+    }
+
+    setBusinesses(liked);
+    setPoolSource('liked');
+    const pick = pickRandom(liked);
+    if (pick) {
+      showSpin(liked, pick);
+    } else {
+      setSpin(null);
+      setStatus('empty');
+    }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -143,10 +193,7 @@ export default function Home() {
 
   const handleSpinAgain = () => {
     const pick = pickRandom(businesses, spin?.business);
-    if (pick) {
-      setSpin(buildSpin(businesses, pick));
-      setStatus('result');
-    }
+    if (pick) showSpin(businesses, pick);
     // The reel is at the top of the sheet; scroll back up so the spin is visible.
     sheetRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -155,7 +202,8 @@ export default function Home() {
   const canSpinAgain = status === 'error' ? businesses.length > 0 : businesses.some(b => b.id !== spin?.business.id);
   const canRetry = status === 'error' && !!error?.retryable;
   const handleRetry = () => {
-    if (hasWhere) getBusinessList();
+    if (action === 'liked') spinLikedSpots();
+    else if (hasWhere) getBusinessList();
   };
 
   // Disliked places drop out of this search's pool so "Spin again" skips them.
@@ -177,6 +225,8 @@ export default function Home() {
             <p className="text-sm text-white/70">Hey {user.displayName?.split(' ')[0] ?? user.email?.split('@')[0] ?? 'there'} 👋</p>
             <h1 className="mt-1 text-4xl font-extrabold sm:text-5xl text-balance">Where are we eating tonight?</h1>
           </div>
+
+          <VisitPrompt key={user.uid} userID={user.uid} />
 
           <div className="grid items-start gap-6 lg:grid-cols-[380px_1fr]">
             <Card className="p-5 sm:p-6">
@@ -259,6 +309,14 @@ export default function Home() {
                     </p>
                   )}
                 </div>
+                <div className="space-y-2 border-t border-border pt-5">
+                  <Button type="button" variant="outline" className="w-full" onClick={spinLikedSpots} disabled={status === 'loading'}>
+                    <Heart className="h-4 w-4" aria-hidden /> Spin my liked spots
+                  </Button>
+                  <p className="text-center text-xs text-muted-foreground">
+                    Picks from places you&rsquo;ve liked. Doesn&rsquo;t use a search.
+                  </p>
+                </div>
                 {isMobile && status !== 'idle' && (
                   <Button type="button" variant="ghost" className="-mt-3 w-full" onClick={() => setSheetOpen(true)}>
                     <History className="h-4 w-4" aria-hidden /> Back to your last spin
@@ -295,7 +353,8 @@ export default function Home() {
                   status={status}
                   error={error}
                   spin={spin}
-                  likedPlaces={likedPlaces}
+                  source={status === 'result' ? poolSource : action}
+                  likedPlaces={poolSource === 'liked' ? businesses : likedPlaces}
                   poolSize={businesses.length}
                   canSpinAgain={canSpinAgain && !isMobile}
                   onSpinAgain={handleSpinAgain}

@@ -18,6 +18,10 @@ export interface Spin {
 
 export type MachineStatus = 'idle' | 'loading' | 'error' | 'empty' | 'result';
 
+// Where the reel's places come from: a Google search (open right now) or the
+// user's own liked spots (no search, so opening hours are unknown).
+export type SpinSource = 'search' | 'liked';
+
 const ITEM_HEIGHT = 80;
 const SPIN_MS = 1800;
 const IDLE_WORDS = ['Tacos', 'Ramen', 'Pizza', 'Sushi', 'Burgers', 'Pho', 'Curry', 'BBQ', 'Dim sum', 'Falafel'];
@@ -90,8 +94,9 @@ function Lights() {
     );
 }
 
-function ResultDetails({ business, likedPlaces, onDisliked, demo }: {
+function ResultDetails({ business, likedPlaces, onDisliked, demo, openNow }: {
     business: Business;
+    openNow: boolean;
     likedPlaces: Business[];
     onDisliked: (business: Business) => void;
     demo?: boolean;
@@ -181,9 +186,11 @@ function ResultDetails({ business, likedPlaces, onDisliked, demo }: {
                         </span>
                     ) : null}
                     {business.price && <span className="rounded-full bg-secondary px-2 py-0.5 font-semibold">{business.price}</span>}
-                    <span className="inline-flex items-center gap-1 font-medium text-success">
-                        <span className="h-2 w-2 rounded-full bg-success" /> Open now
-                    </span>
+                    {openNow && (
+                        <span className="inline-flex items-center gap-1 font-medium text-success">
+                            <span className="h-2 w-2 rounded-full bg-success" /> Open now
+                        </span>
+                    )}
                 </div>
 
                 <p className="mt-3 flex gap-1.5 text-sm text-muted-foreground">
@@ -255,7 +262,7 @@ const ERROR_ICONS: Partial<Record<SearchError['code'], LucideIcon>> = {
     UNAUTHENTICATED: LogIn,
 };
 
-export default function SlotMachine({ status, error, spin, likedPlaces, poolSize, canSpinAgain, onSpinAgain, onRetry, onDisliked, demo }: {
+export default function SlotMachine({ status, error, spin, likedPlaces, poolSize, canSpinAgain, onSpinAgain, onRetry, onDisliked, demo, source = 'search' }: {
     status: MachineStatus;
     error?: SearchError | null;
     spin: Spin | null;
@@ -268,7 +275,9 @@ export default function SlotMachine({ status, error, spin, likedPlaces, poolSize
     onDisliked: (business: Business) => void;
     // The welcome page's sample spin: no saving, sharing or outbound links.
     demo?: boolean;
+    source?: SpinSource;
 }) {
+    const fromLiked = source === 'liked';
     const [landedId, setLandedId] = useState<number | null>(null);
     const landed = spin !== null && landedId === spin.id;
 
@@ -291,16 +300,16 @@ export default function SlotMachine({ status, error, spin, likedPlaces, poolSize
                 </ReelWindow>
                 <p className="mt-3 text-center text-sm text-white/60" aria-live="polite">
                     {status === 'idle' && 'Set your filters and pull the lever.'}
-                    {status === 'loading' && 'Finding places open right now…'}
-                    {status === 'error' && 'The search didn’t go through.'}
-                    {status === 'empty' && 'The search worked, but nothing came up.'}
-                    {status === 'result' && (landed ? `Picked from ${poolSize} open ${poolSize === 1 ? 'spot' : 'spots'}` : 'Spinning…')}
+                    {status === 'loading' && (fromLiked ? 'Shuffling your liked spots…' : 'Finding places open right now…')}
+                    {status === 'error' && (fromLiked ? 'Your liked spots didn’t load.' : 'The search didn’t go through.')}
+                    {status === 'empty' && (fromLiked ? 'Nothing to spin yet.' : 'The search worked, but nothing came up.')}
+                    {status === 'result' && (landed ? `Picked from ${fromLiked ? 'your ' : ''}${poolSize} ${fromLiked ? 'liked' : 'open'} ${poolSize === 1 ? 'spot' : 'spots'}` : 'Spinning…')}
                 </p>
             </div>
 
             {status === 'result' && spin && landed ? (
                 <>
-                    <ResultDetails key={spin.business.id} business={spin.business} likedPlaces={likedPlaces} onDisliked={onDisliked} demo={demo} />
+                    <ResultDetails key={spin.business.id} business={spin.business} likedPlaces={likedPlaces} onDisliked={onDisliked} demo={demo} openNow={!fromLiked} />
                     <div className="flex flex-col items-center gap-2 border-t border-border px-5 py-4 sm:flex-row sm:justify-between sm:px-6">
                         <p className="text-xs text-muted-foreground">{demo ? 'Sample restaurants for the demo' : 'Restaurant data from Google Maps'}</p>
                         {canSpinAgain && (
@@ -330,11 +339,19 @@ export default function SlotMachine({ status, error, spin, likedPlaces, poolSize
                     )}
                 </StatusPanel>
             ) : status === 'empty' ? (
-                <StatusPanel
-                    icon={SearchX}
-                    title="Nothing open matches"
-                    hint="Try a wider distance, fewer price filters, or a different craving, then pull the lever again."
-                />
+                fromLiked ? (
+                    <StatusPanel
+                        icon={ThumbsUp}
+                        title="No liked spots yet"
+                        hint="Tap Like on a spin you enjoy. Once you have a few, you can spin from them here without using a search."
+                    />
+                ) : (
+                    <StatusPanel
+                        icon={SearchX}
+                        title="Nothing open matches"
+                        hint="Try a wider distance, fewer price filters, or a different craving, then pull the lever again."
+                    />
+                )
             ) : (
                 <div className="flex flex-col items-center gap-2 px-6 py-10 text-center text-muted-foreground">
                     <UtensilsCrossed className="h-8 w-8" aria-hidden />

@@ -35,7 +35,7 @@ export const addUser = async (userID: string, email: string) => {
 
 // Each saved place is its own doc at users/{uid}/{list}/{placeId}, so adds and
 // removes only need the place id and never depend on the stored copy matching.
-type PlaceList = 'liked' | 'disliked';
+type PlaceList = 'liked' | 'disliked' | 'visited';
 
 const placeRef = (userID: string, list: PlaceList, placeID: string) =>
     doc(db, 'users', userID, list, placeID);
@@ -85,6 +85,20 @@ export const addDislikedPlace = (userID: string, business: Business) => savePlac
 export const removedLikedPlace = (userID: string, business: Business) => removePlace(userID, 'liked', business);
 export const removedDislikedPlace = (userID: string, business: Business) => removePlace(userID, 'disliked', business);
 
+// Places the user confirmed they went to (the "Did you go?" prompt). One doc per
+// place, so going again just moves it to the top with the new date.
+export const addVisitedPlace = (userID: string, business: Business) => savePlace(userID, 'visited', business);
+export const removedVisitedPlace = (userID: string, business: Business) => removePlace(userID, 'visited', business);
+
+// Like getPlaces, but keeps when the visit was logged as `visitedAt` (ms).
+export const getVisitedPlaces = async (userID: string): Promise<Business[]> => {
+    const snapshot = await getDocs(query(collection(db, 'users', userID, 'visited'), orderBy('savedAt', 'desc')));
+    return snapshot.docs.map((d) => {
+        const { savedAt, ...business } = d.data() as Business;
+        return { ...business, id: d.id, visitedAt: savedAt?.toMillis?.() ?? null };
+    });
+};
+
 // Searches left today from the counters at usage/{day} and
 // usage/{day}/users/{uid}, or null if they can't be read. The server enforces
 // the limits; this is just for display.
@@ -101,10 +115,10 @@ export const getSearchesRemaining = async (userID: string, isGuest: boolean): Pr
     }
 };
 
-// Deletes everything stored for a user: their liked/disliked places and user doc.
+// Deletes everything stored for a user: their liked/disliked/visited places and user doc.
 export const deleteUserData = async (userID: string) => {
     const batch = writeBatch(db);
-    for (const list of ['liked', 'disliked'] as const) {
+    for (const list of ['liked', 'disliked', 'visited'] as const) {
         const snapshot = await getDocs(collection(db, 'users', userID, list));
         snapshot.docs.forEach((d) => batch.delete(d.ref));
     }

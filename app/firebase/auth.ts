@@ -17,6 +17,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import Cookies from 'js-cookie';
 import { auth, db } from './firebaseConfig';
 import { addUser, deleteUserData } from './firestore';
+import { clearLastPick } from '@/lib/lastPick';
 
 // The proxy only checks that this cookie exists to skip the welcome page;
 // real access control is Firebase Auth plus Firestore rules.
@@ -89,6 +90,7 @@ export const deleteAccount = async (user: User, password?: string) => {
         await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email ?? '', password ?? ''));
     }
     await deleteUserData(user.uid);
+    clearLastPick(user.uid);
     await deleteUser(user);
     Cookies.remove('user');
 };
